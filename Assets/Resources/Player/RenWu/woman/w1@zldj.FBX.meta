@@ -1,0 +1,265 @@
+fileFormatVersion: 2
+guid: 51c5e64b621fdec49b3bc9c82d1284ca
+timeCreated: 1447740739
+licenseType: Pro
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: Dummy01
+    100002: Dummy02
+    100004: Dummy03
+    100006: Dummy04
+    100008: Dummy05
+    100010: Dummy06
+    100012: Dummy07
+    100014: Dummy08
+    100016: Dummy09
+    100018: Dummy10
+    100020: Dummy11
+    100022: Dummy12
+    100024: Dummy15
+    100026: f12Bip
+    100028: f12Bip Head
+    100030: f12Bip L Calf
+    100032: f12Bip L Clavicle
+    100034: f12Bip L Finger0
+    100036: f12Bip L Finger01
+    100038: f12Bip L Finger02
+    100040: f12Bip L Finger1
+    100042: f12Bip L Finger11
+    100044: f12Bip L Finger12
+    100046: f12Bip L Finger2
+    100048: f12Bip L Finger21
+    100050: f12Bip L Finger22
+    100052: f12Bip L Finger3
+    100054: f12Bip L Finger31
+    100056: f12Bip L Finger32
+    100058: f12Bip L Finger4
+    100060: f12Bip L Finger41
+    100062: f12Bip L Finger42
+    100064: f12Bip L Foot
+    100066: f12Bip L Forearm
+    100068: f12Bip L Hand
+    100070: f12Bip L Thigh
+    100072: f12Bip L Toe0
+    100074: f12Bip L UpperArm
+    100076: f12Bip Neck
+    100078: f12Bip Pelvis
+    100080: f12Bip R Calf
+    100082: f12Bip R Clavicle
+    100084: f12Bip R Finger0
+    100086: f12Bip R Finger01
+    100088: f12Bip R Finger02
+    100090: f12Bip R Finger1
+    100092: f12Bip R Finger11
+    100094: f12Bip R Finger12
+    100096: f12Bip R Finger2
+    100098: f12Bip R Finger21
+    100100: f12Bip R Finger22
+    100102: f12Bip R Finger3
+    100104: f12Bip R Finger31
+    100106: f12Bip R Finger32
+    100108: f12Bip R Finger4
+    100110: f12Bip R Finger41
+    100112: f12Bip R Finger42
+    100114: f12Bip R Foot
+    100116: f12Bip R Forearm
+    100118: f12Bip R Hand
+    100120: f12Bip R Thigh
+    100122: f12Bip R Toe0
+    100124: f12Bip R UpperArm
+    100126: f12Bip Spine
+    100128: f12Bip Spine1
+    100130: f12Bip Spine2
+    100132: f12Bip Xtra01
+    100134: f12Bip Xtra02
+    100136: f12Bip Xtra03
+    100138: f12Bip Xtra04
+    100140: f12Bip Xtra05
+    100142: f12Bip Xtra06
+    100144: f12Bip Xtra07
+    100146: f12Bip Xtra08
+    100148: f12Bip Xtra09
+    100150: f12Bip Xtra10
+    100152: f12Bip Xtra11
+    100154: f12Bip Xtra12
+    100156: f12Bip Xtra13
+    100158: f12Bip Xtra13Nub
+    100160: f12Bip Xtra13Opp
+    100162: f12Bip Xtra13OppNub
+    100164: f12Bip Xtra14
+    100166: f12Bip Xtra14Nub
+    100168: f12Bip Xtra14Opp
+    100170: f12Bip Xtra14OppNub
+    100172: f3Bip01 Xtra01Nub
+    100174: f3Bip01 Xtra02Nub
+    100176: f3Bip01 Xtra03Nub
+    100178: f3Bip01 Xtra04Nub
+    100180: f3Bip01 Xtra05Nub
+    100182: f3Bip01 Xtra06Nub
+    100184: f3Bip01 Xtra07Nub
+    100186: f3Bip01 Xtra08Nub
+    100188: f3Bip01 Xtra09Nub
+    100190: f3Bip01 Xtra10Nub
+    100192: f3Bip01 Xtra11Nub
+    100194: f3Bip01 Xtra12Nub
+    100196: //RootNode
+    400000: Dummy01
+    400002: Dummy02
+    400004: Dummy03
+    400006: Dummy04
+    400008: Dummy05
+    400010: Dummy06
+    400012: Dummy07
+    400014: Dummy08
+    400016: Dummy09
+    400018: Dummy10
+    400020: Dummy11
+    400022: Dummy12
+    400024: Dummy15
+    400026: f12Bip
+    400028: f12Bip Head
+    400030: f12Bip L Calf
+    400032: f12Bip L Clavicle
+    400034: f12Bip L Finger0
+    400036: f12Bip L Finger01
+    400038: f12Bip L Finger02
+    400040: f12Bip L Finger1
+    400042: f12Bip L Finger11
+    400044: f12Bip L Finger12
+    400046: f12Bip L Finger2
+    400048: f12Bip L Finger21
+    400050: f12Bip L Finger22
+    400052: f12Bip L Finger3
+    400054: f12Bip L Finger31
+    400056: f12Bip L Finger32
+    400058: f12Bip L Finger4
+    400060: f12Bip L Finger41
+    400062: f12Bip L Finger42
+    400064: f12Bip L Foot
+    400066: f12Bip L Forearm
+    400068: f12Bip L Hand
+    400070: f12Bip L Thigh
+    400072: f12Bip L Toe0
+    400074: f12Bip L UpperArm
+    400076: f12Bip Neck
+    400078: f12Bip Pelvis
+    400080: f12Bip R Calf
+    400082: f12Bip R Clavicle
+    400084: f12Bip R Finger0
+    400086: f12Bip R Finger01
+    400088: f12Bip R Finger02
+    400090: f12Bip R Finger1
+    400092: f12Bip R Finger11
+    400094: f12Bip R Finger12
+    400096: f12Bip R Finger2
+    400098: f12Bip R Finger21
+    400100: f12Bip R Finger22
+    400102: f12Bip R Finger3
+    400104: f12Bip R Finger31
+    400106: f12Bip R Finger32
+    400108: f12Bip R Finger4
+    400110: f12Bip R Finger41
+    400112: f12Bip R Finger42
+    400114: f12Bip R Foot
+    400116: f12Bip R Forearm
+    400118: f12Bip R Hand
+    400120: f12Bip R Thigh
+    400122: f12Bip R Toe0
+    400124: f12Bip R UpperArm
+    400126: f12Bip Spine
+    400128: f12Bip Spine1
+    400130: f12Bip Spine2
+    400132: f12Bip Xtra01
+    400134: f12Bip Xtra02
+    400136: f12Bip Xtra03
+    400138: f12Bip Xtra04
+    400140: f12Bip Xtra05
+    400142: f12Bip Xtra06
+    400144: f12Bip Xtra07
+    400146: f12Bip Xtra08
+    400148: f12Bip Xtra09
+    400150: f12Bip Xtra10
+    400152: f12Bip Xtra11
+    400154: f12Bip Xtra12
+    400156: f12Bip Xtra13
+    400158: f12Bip Xtra13Nub
+    400160: f12Bip Xtra13Opp
+    400162: f12Bip Xtra13OppNub
+    400164: f12Bip Xtra14
+    400166: f12Bip Xtra14Nub
+    400168: f12Bip Xtra14Opp
+    400170: f12Bip Xtra14OppNub
+    400172: f3Bip01 Xtra01Nub
+    400174: f3Bip01 Xtra02Nub
+    400176: f3Bip01 Xtra03Nub
+    400178: f3Bip01 Xtra04Nub
+    400180: f3Bip01 Xtra05Nub
+    400182: f3Bip01 Xtra06Nub
+    400184: f3Bip01 Xtra07Nub
+    400186: f3Bip01 Xtra08Nub
+    400188: f3Bip01 Xtra09Nub
+    400190: f3Bip01 Xtra10Nub
+    400192: f3Bip01 Xtra11Nub
+    400194: f3Bip01 Xtra12Nub
+    400196: //RootNode
+    7400000: Take 001
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

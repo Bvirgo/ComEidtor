@@ -1,0 +1,307 @@
+fileFormatVersion: 2
+guid: 40ac086d7f33ec8488b23392b76d3b03
+timeCreated: 1446271270
+licenseType: Pro
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: changqun
+    100002: Dummy01
+    100004: Dummy02
+    100006: Dummy03
+    100008: Dummy04
+    100010: Dummy05
+    100012: Dummy06
+    100014: Dummy07
+    100016: Dummy08
+    100018: Dummy09
+    100020: Dummy10
+    100022: Dummy11
+    100024: Dummy12
+    100026: Dummy15
+    100028: f12Bip
+    100030: f12Bip Head
+    100032: f12Bip L Calf
+    100034: f12Bip L Clavicle
+    100036: f12Bip L Finger0
+    100038: f12Bip L Finger01
+    100040: f12Bip L Finger02
+    100042: f12Bip L Finger1
+    100044: f12Bip L Finger11
+    100046: f12Bip L Finger12
+    100048: f12Bip L Finger2
+    100050: f12Bip L Finger21
+    100052: f12Bip L Finger22
+    100054: f12Bip L Finger3
+    100056: f12Bip L Finger31
+    100058: f12Bip L Finger32
+    100060: f12Bip L Finger4
+    100062: f12Bip L Finger41
+    100064: f12Bip L Finger42
+    100066: f12Bip L Foot
+    100068: f12Bip L Forearm
+    100070: f12Bip L Hand
+    100072: f12Bip L Thigh
+    100074: f12Bip L Toe0
+    100076: f12Bip L UpperArm
+    100078: f12Bip Neck
+    100080: f12Bip Pelvis
+    100082: f12Bip R Calf
+    100084: f12Bip R Clavicle
+    100086: f12Bip R Finger0
+    100088: f12Bip R Finger01
+    100090: f12Bip R Finger02
+    100092: f12Bip R Finger1
+    100094: f12Bip R Finger11
+    100096: f12Bip R Finger12
+    100098: f12Bip R Finger2
+    100100: f12Bip R Finger21
+    100102: f12Bip R Finger22
+    100104: f12Bip R Finger3
+    100106: f12Bip R Finger31
+    100108: f12Bip R Finger32
+    100110: f12Bip R Finger4
+    100112: f12Bip R Finger41
+    100114: f12Bip R Finger42
+    100116: f12Bip R Foot
+    100118: f12Bip R Forearm
+    100120: f12Bip R Hand
+    100122: f12Bip R Thigh
+    100124: f12Bip R Toe0
+    100126: f12Bip R UpperArm
+    100128: f12Bip Spine
+    100130: f12Bip Spine1
+    100132: f12Bip Spine2
+    100134: f12Bip Xtra01
+    100136: f12Bip Xtra02
+    100138: f12Bip Xtra03
+    100140: f12Bip Xtra04
+    100142: f12Bip Xtra05
+    100144: f12Bip Xtra06
+    100146: f12Bip Xtra07
+    100148: f12Bip Xtra08
+    100150: f12Bip Xtra09
+    100152: f12Bip Xtra10
+    100154: f12Bip Xtra11
+    100156: f12Bip Xtra12
+    100158: f12Bip Xtra13
+    100160: f12Bip Xtra13Nub
+    100162: f12Bip Xtra13Opp
+    100164: f12Bip Xtra13OppNub
+    100166: f12Bip Xtra14
+    100168: f12Bip Xtra14Nub
+    100170: f12Bip Xtra14Opp
+    100172: f12Bip Xtra14OppNub
+    100174: f3Bip01 Xtra01Nub
+    100176: f3Bip01 Xtra02Nub
+    100178: f3Bip01 Xtra03Nub
+    100180: f3Bip01 Xtra04Nub
+    100182: f3Bip01 Xtra05Nub
+    100184: f3Bip01 Xtra06Nub
+    100186: f3Bip01 Xtra07Nub
+    100188: f3Bip01 Xtra08Nub
+    100190: f3Bip01 Xtra09Nub
+    100192: f3Bip01 Xtra10Nub
+    100194: f3Bip01 Xtra11Nub
+    100196: f3Bip01 Xtra12Nub
+    100198: //RootNode
+    100200: wbody_a01
+    100202: wface_a03
+    100204: whair_b06
+    100206: xiezi
+    100208: yifu01
+    100210: zhijia
+    100212: "\u4E4C\u9ED1\u6D53\u5BC6"
+    100214: "\u6321\u677F"
+    100216: "\u7259\u4E0A"
+    100218: "\u7259\u4E0B"
+    400000: changqun
+    400002: Dummy01
+    400004: Dummy02
+    400006: Dummy03
+    400008: Dummy04
+    400010: Dummy05
+    400012: Dummy06
+    400014: Dummy07
+    400016: Dummy08
+    400018: Dummy09
+    400020: Dummy10
+    400022: Dummy11
+    400024: Dummy12
+    400026: Dummy15
+    400028: f12Bip
+    400030: f12Bip Head
+    400032: f12Bip L Calf
+    400034: f12Bip L Clavicle
+    400036: f12Bip L Finger0
+    400038: f12Bip L Finger01
+    400040: f12Bip L Finger02
+    400042: f12Bip L Finger1
+    400044: f12Bip L Finger11
+    400046: f12Bip L Finger12
+    400048: f12Bip L Finger2
+    400050: f12Bip L Finger21
+    400052: f12Bip L Finger22
+    400054: f12Bip L Finger3
+    400056: f12Bip L Finger31
+    400058: f12Bip L Finger32
+    400060: f12Bip L Finger4
+    400062: f12Bip L Finger41
+    400064: f12Bip L Finger42
+    400066: f12Bip L Foot
+    400068: f12Bip L Forearm
+    400070: f12Bip L Hand
+    400072: f12Bip L Thigh
+    400074: f12Bip L Toe0
+    400076: f12Bip L UpperArm
+    400078: f12Bip Neck
+    400080: f12Bip Pelvis
+    400082: f12Bip R Calf
+    400084: f12Bip R Clavicle
+    400086: f12Bip R Finger0
+    400088: f12Bip R Finger01
+    400090: f12Bip R Finger02
+    400092: f12Bip R Finger1
+    400094: f12Bip R Finger11
+    400096: f12Bip R Finger12
+    400098: f12Bip R Finger2
+    400100: f12Bip R Finger21
+    400102: f12Bip R Finger22
+    400104: f12Bip R Finger3
+    400106: f12Bip R Finger31
+    400108: f12Bip R Finger32
+    400110: f12Bip R Finger4
+    400112: f12Bip R Finger41
+    400114: f12Bip R Finger42
+    400116: f12Bip R Foot
+    400118: f12Bip R Forearm
+    400120: f12Bip R Hand
+    400122: f12Bip R Thigh
+    400124: f12Bip R Toe0
+    400126: f12Bip R UpperArm
+    400128: f12Bip Spine
+    400130: f12Bip Spine1
+    400132: f12Bip Spine2
+    400134: f12Bip Xtra01
+    400136: f12Bip Xtra02
+    400138: f12Bip Xtra03
+    400140: f12Bip Xtra04
+    400142: f12Bip Xtra05
+    400144: f12Bip Xtra06
+    400146: f12Bip Xtra07
+    400148: f12Bip Xtra08
+    400150: f12Bip Xtra09
+    400152: f12Bip Xtra10
+    400154: f12Bip Xtra11
+    400156: f12Bip Xtra12
+    400158: f12Bip Xtra13
+    400160: f12Bip Xtra13Nub
+    400162: f12Bip Xtra13Opp
+    400164: f12Bip Xtra13OppNub
+    400166: f12Bip Xtra14
+    400168: f12Bip Xtra14Nub
+    400170: f12Bip Xtra14Opp
+    400172: f12Bip Xtra14OppNub
+    400174: f3Bip01 Xtra01Nub
+    400176: f3Bip01 Xtra02Nub
+    400178: f3Bip01 Xtra03Nub
+    400180: f3Bip01 Xtra04Nub
+    400182: f3Bip01 Xtra05Nub
+    400184: f3Bip01 Xtra06Nub
+    400186: f3Bip01 Xtra07Nub
+    400188: f3Bip01 Xtra08Nub
+    400190: f3Bip01 Xtra09Nub
+    400192: f3Bip01 Xtra10Nub
+    400194: f3Bip01 Xtra11Nub
+    400196: f3Bip01 Xtra12Nub
+    400198: //RootNode
+    400200: wbody_a01
+    400202: wface_a03
+    400204: whair_b06
+    400206: xiezi
+    400208: yifu01
+    400210: zhijia
+    400212: "\u4E4C\u9ED1\u6D53\u5BC6"
+    400214: "\u6321\u677F"
+    400216: "\u7259\u4E0A"
+    400218: "\u7259\u4E0B"
+    4300000: "\u7259\u4E0A"
+    4300002: "\u7259\u4E0B"
+    4300004: "\u6321\u677F"
+    4300006: zhijia
+    4300008: xiezi
+    4300010: wbody_a01
+    4300012: changqun
+    4300014: wface_a03
+    4300016: whair_b06
+    4300018: yifu01
+    7400000: Take 001
+    9500000: //RootNode
+    13700000: changqun
+    13700002: wbody_a01
+    13700004: wface_a03
+    13700006: whair_b06
+    13700008: xiezi
+    13700010: yifu01
+    13700012: zhijia
+    13700014: "\u6321\u677F"
+    13700016: "\u7259\u4E0A"
+    13700018: "\u7259\u4E0B"
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
