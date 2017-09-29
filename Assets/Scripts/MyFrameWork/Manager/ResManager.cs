@@ -563,6 +563,10 @@ namespace MyFrameWork
                                 bins = fbin;
                                 crc = Crc32.CountCrc(bins).ToString();
 
+                                //string crc1 = Utils.CaclCRC(bins).ToString();
+
+                                //Debug.LogWarning(string.Format("Crc32:{0},Utils-Crc:{1}",crc,crc1));
+
                                 // 加载完成，切换到主线程回调
                                 Loom.QueueOnMainThread(()=> {
                                     callback(this);

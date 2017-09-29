@@ -186,6 +186,10 @@ public class MainView : BaseUI {
         }
     }
 
+    /// <summary>
+    /// 选择组件
+    /// </summary>
+    /// <param name="_cpp"></param>
     private void ComItemClick(ComProperty _cpp)
     {
         txt_id.text = _cpp.m_strCode;
@@ -224,6 +228,10 @@ public class MainView : BaseUI {
         txt_imgName.text = _strImgName;
     }
 
+    /// <summary>
+    /// 导入模型
+    /// </summary>
+    /// <param name="_strModelName"></param>
     public void OnRefreshModel(string _strModelName)
     {
         txt_file.text = _strModelName;

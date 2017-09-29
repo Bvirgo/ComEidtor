@@ -3,59 +3,192 @@ using System.Collections;
 using System.IO;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using LitJson;
-using System.Reflection;
 using System.Text;
-using SimpleJSON;
-using Jhqc.EditorCommon;
-using System.Runtime.InteropServices;
-using System.Collections.Specialized;
-using System.Drawing;
-using System.Windows.Forms;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using UnityEngine.EventSystems;
 
 public static class Utils
 {
-    public static string GetFileNameWithoutExtention(string fileName, char separator = '/')
-    {
-        var name = GetFileNameBySeparator(fileName, separator);
-        return GetFilePathWithoutExtention(name);
-    }
-
-    public static string GetFilePathWithoutExtention(string fileName)
-    {
-        return fileName.Substring(0, fileName.LastIndexOf('.'));
-    }
-
+    #region 文件名相关
+    /// <summary>
+    /// 获取路径目录，除去文件名
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <returns></returns>
     public static string GetDirectoryName(string fileName)
     {
-        if(string.IsNullOrEmpty(fileName))
+        if (string.IsNullOrEmpty(fileName))
             return null;
 
         int index = fileName.LastIndexOf('/');
-        if(index < 0)
+        if (index < 0)
             return "";
 
         return fileName.Substring(0, index);
     }
-
-    public static string GetFileNameBySeparator(string path, char separator = '/')
+    /// <summary>
+    /// 路径转为标准格式路径
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public static string GetStandardPath(string path)
     {
-        return path.Substring(path.LastIndexOf(separator) + 1);
+        int loopNum = 20;
+        path = path.Replace(@"\", @"/");
+        while (path.IndexOf(@"//") != -1)
+        {
+            path = path.Replace(@"//", @"/");
+            loopNum--;
+            if (loopNum < 0)
+            {
+                Debug.Log("路径清理失败: " + path);
+                return path;
+            }
+        }
+        return path;
     }
 
+    public static string GetFolderPath(string path, bool fullPath = true)
+    {
+        path = GetStandardPath(path);
+        if (fullPath)//获取全路径
+        {
+            if (path.LastIndexOf(@"/") == path.Length - 1)
+                return GetFolderPath(path.Substring(0, path.Length - 1));
+            else
+                return path.Substring(0, path.LastIndexOf(@"/") + 1);
+        }
+        else//获取父级文件夹名
+        {
+            string[] strArr = path.Split('/');
+
+            if (path.LastIndexOf(@"/") == path.Length - 1)
+                return strArr[strArr.Length - 2];
+            else
+                return strArr[strArr.Length - 1];
+        }
+    }
+
+    /// <summary>
+    /// 获取文件名
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="needPostfix">是否需要带后缀</param>
+    /// <returns></returns>
+    public static string GetFileName(string path, bool needPostfix = false)
+    {
+        path = GetStandardPath(path);
+        string fileFolderPath = path.Substring(0, path.LastIndexOf(@"/") + 1);
+
+        string fileName = path.Substring(path.LastIndexOf("/") + 1, path.Length - fileFolderPath.Length);
+        if (needPostfix)
+            return fileName;
+        else
+            return fileName.Substring(0, fileName.LastIndexOf("."));
+    }
+    /// <summary>获取文件名后缀</summary>
+    public static string GetFilePostfix(string fileName)
+    {
+        if (fileName == null)
+            return null;
+        string res;
+        if (fileName.IndexOf(".") == -1)
+            res = "";
+        else
+        {
+            string[] ss = fileName.Split(new char[1] { '.' });
+            res = ss[ss.Length - 1];
+        }
+        return res;
+    }
+
+    /// <summary>
+    /// 去掉文件名前缀
+    /// </summary>
+    /// <param name="_strName"></param>
+    /// <returns></returns>
+    public static string GetPrefix(string _strName)
+    {
+        string strName = _strName;
+        int nIndex = strName.LastIndexOf('.');
+        if (nIndex > 0 && nIndex < strName.Length - 1)
+        {
+            strName = strName.Substring(0, strName.LastIndexOf('.'));
+        }
+
+        return strName;
+    }
+
+    public static string GetParentFolderPath(string path, bool fullPath = true)
+    {
+        path = GetStandardPath(path);
+        if (fullPath)//获取全路径
+        {
+            if (path.LastIndexOf(@"/") == path.Length - 1)
+                return GetFolderPath(path.Substring(0, path.Length - 1));
+            else
+                return path.Substring(0, path.LastIndexOf(@"/") + 1);
+        }
+        else//获取父级文件夹名
+        {
+            string[] strArr = path.Split('/');
+            return strArr[strArr.Length - 2];
+        }
+    }
+    #endregion
+
+    #region 文件读写相关
+    public static byte[] LoadFile(FileInfo fInfo)
+    {
+        return LoadFile(fInfo.FullName);
+    }
+    public static byte[] LoadFile(string path) //@path)
+    {
+        if (File.Exists(path))
+        {
+            using (FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read))
+            {
+                //创建文件长度缓冲区
+                byte[] bytes = new byte[fileStream.Length];
+                fileStream.Seek(0, SeekOrigin.Begin);
+                //读取文件
+                fileStream.Read(bytes, 0, (int)fileStream.Length);
+                return bytes;
+            }
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public static string LoadFile2String(string path)
+    {
+        if (File.Exists(path))
+        {
+            return File.ReadAllText(path);
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+    /// <summary>
+    /// 读取文本：PC模式，移动模式
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
     public static string ReadTextFile(string path)
     {
-        if(path.Contains("file://"))
+        if (path.Contains("file://"))
         {
             WWW w3 = new WWW(path);
 
-            while(!w3.isDone)
+            while (!w3.isDone)
                 System.Threading.Thread.Sleep(1);
 
-            if(w3.error == null)
+            if (w3.error == null)
                 return w3.text;
             else
             {
@@ -68,7 +201,7 @@ public static class Utils
             {
                 return File.ReadAllText(path);
             }
-            catch(System.Exception)
+            catch (System.Exception)
             {
                 return null;
             }
@@ -80,30 +213,6 @@ public static class Utils
         File.WriteAllText(path, text);
     }
 
-    public static bool HasChinese(this string str)
-    {
-        return Regex.IsMatch(str, @"[\u4e00-\u9fa5]");
-    }
-
-    public static bool IsLegelString(string tarStr)
-    {
-        return (tarStr != "" &&
-            tarStr != "null" &&
-            tarStr != null);
-    }
-
-    /// <summary>
-    /// 纯数字
-    /// </summary>
-    /// <param name="_str"></param>
-    /// <returns></returns>
-    public static bool IsInt(string _str)
-    {
-        Regex regex = new Regex(@"^\d+$");
-
-        // 区号纯数字
-        return regex.IsMatch(_str);
-    }
     /// <summary>
     /// 带时间戳保存
     /// </summary>
@@ -111,7 +220,7 @@ public static class Utils
     /// <param name="_strFileName"></param>
     /// <param name="_strType"></param>
     /// <param name="_bAppend"></param>
-    public static void  SaveInfo(string _strMsg, string _strFileName = "CityEditorInfo", string _strType = ".txt", bool _bAppend = false)
+    public static void SaveInfo(string _strMsg, string _strFileName = "CityEditorInfo", string _strType = ".txt", bool _bAppend = false)
     {
         if (!Directory.Exists(GetDataPath() + "SaveData/"))
             Directory.CreateDirectory(GetDataPath() + "SaveData/");
@@ -136,7 +245,7 @@ public static class Utils
         if (!Directory.Exists(GetDataPath() + "SaveData/"))
             Directory.CreateDirectory(GetDataPath() + "SaveData/");
 
-        string strPath = GetDataPath() + "SaveData/" + _strFileName  + _strType;
+        string strPath = GetDataPath() + "SaveData/" + _strFileName + _strType;
 
         UTF8Encoding utf8BOM = new UTF8Encoding(true);
         StreamWriter sw = new StreamWriter(strPath, true, utf8BOM);
@@ -144,6 +253,75 @@ public static class Utils
         sw.Close();
     }
 
+    #endregion
+
+    #region 文件存在性
+    public static bool IsDirExists(string path)
+    {
+        return Directory.Exists(path);
+    }
+
+    public static bool IsFileExists(string path)
+    {
+        return File.Exists(path);
+    }
+    #endregion
+
+    #region 字符串相关操作
+    public static bool HasChinese(this string str)
+    {
+        return Regex.IsMatch(str, @"[\u4e00-\u9fa5]");
+    }
+
+    public static bool IsLegelString(string tarStr)
+    {
+        return (tarStr != "" &&
+            tarStr != "null" &&
+            tarStr != null);
+    }
+    /// <summary>
+    /// 纯数字
+    /// </summary>
+    /// <param name="_str"></param>
+    /// <returns></returns>
+    public static bool IsInt(string _str)
+    {
+        Regex regex = new Regex(@"^\d+$");
+
+        // 区号纯数字
+        return regex.IsMatch(_str);
+    }
+
+    public static byte[] String2ByteDefault(string str)
+    {
+        return Encoding.Default.GetBytes(str);
+    }
+
+    public static string Byte2StringDefault(byte[] byt)
+    {
+        return Encoding.Default.GetString(byt);
+    }
+
+    public static byte[] String2ByteUTF8(string str)
+    {
+        return Encoding.UTF8.GetBytes(str);
+    }
+
+    public static string Byte2StringUTF8(byte[] byt)
+    {
+        if (null == byt)
+        {
+            return string.Empty;
+        }
+        return Encoding.UTF8.GetString(byt);
+    }
+    #endregion
+
+    #region 平台相关
+    /// <summary>
+    /// 获取平台dataPath
+    /// </summary>
+    /// <returns></returns>
     public static string GetDataPath()
     {
         string path = "";
@@ -166,12 +344,38 @@ public static class Utils
 
         return path;
     }
+    #endregion
 
-    public static string GetResourcePath()
+    #region 资源加载相关
+
+    public static bool IsPic(string fileName)
     {
-        return GetDataPath() + "ResData";
+        string postFix = GetFilePostfix(fileName);
+        return postFix == "png"
+            || postFix == "PNG"
+            || postFix == "jpg"
+            || postFix == "JPG"
+            || postFix == "jpeg"
+            || postFix == "JPEG";
     }
 
+    public static bool IsFbx(string fileName)
+    {
+        string postFix = GetFilePostfix(fileName);
+        return postFix.ToLower().Equals("fbx");
+    }
+
+    public static bool IsAB(string fileName)
+    {
+        string postFix = GetFilePostfix(fileName);
+        return postFix.ToLower().Equals("assetbundle");
+    }
+    /// <summary>
+    /// 根据URL，加载Texture
+    /// </summary>
+    /// <param name="url"></param>
+    /// <param name="cb"></param>
+    /// <returns></returns>
     public static IEnumerator LoadTexture(string url, Action<Texture2D> cb)
     {
         //这里的url可以是web路径也可以是本地路径file://  
@@ -189,6 +393,12 @@ public static class Utils
         }
     }
 
+    /// <summary>
+    /// 根据URL ，记载AB
+    /// </summary>
+    /// <param name="url"></param>
+    /// <param name="ab"></param>
+    /// <returns></returns>
     public static IEnumerator LoadAssetBundle(string url, Action<AssetBundle> ab)
     {
         WWW www = new WWW(url);
@@ -200,26 +410,31 @@ public static class Utils
             www.Dispose();
         }
     }
+    #endregion
 
-    public static string StringMD5(string data)
-    {
-        byte[] result = Encoding.Default.GetBytes(data.Trim());
-        MD5 md5 = new MD5CryptoServiceProvider();
-        byte[] output = md5.ComputeHash(result);
-        return BitConverter.ToString(output).Replace("-", "");
-    }
-
-    public static void SaveTextureFile(Texture2D incomingTexture, string filename)
+    #region 资源本地保存
+    /// <summary>
+    /// 流，存为Png格式图片
+    /// </summary>
+    /// <param name="incomingTexture"></param>
+    /// <param name="pathName">全路径</param>
+    public static void SaveTextureFile(Texture2D incomingTexture, string pathName)
     {
         byte[] bytes = incomingTexture.EncodeToPNG();
-        string dir = Path.GetDirectoryName(filename);
+        string dir = Path.GetDirectoryName(pathName);
         if (!Directory.Exists(dir))
         {
             Directory.CreateDirectory(dir);
         }
-        File.WriteAllBytes(filename, bytes);
+        File.WriteAllBytes(pathName, bytes);
     }
 
+    /// <summary>
+    /// 保存RenderTexture，到本地
+    /// </summary>
+    /// <param name="rt"></param>
+    /// <param name="filename"></param>
+    /// <returns></returns>
     public static bool SaveRenderTextureToPNG(RenderTexture rt, string filename)
     {
         RenderTexture prev = RenderTexture.active;
@@ -235,7 +450,27 @@ public static class Utils
         return true;
 
     }
+    #endregion
 
+    #region 唯一性相关
+    /// <summary>
+    /// 获取字符串MD5码
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    public static string StringMD5(string data)
+    {
+        byte[] result = Encoding.Default.GetBytes(data.Trim());
+        MD5 md5 = new MD5CryptoServiceProvider();
+        byte[] output = md5.ComputeHash(result);
+        return BitConverter.ToString(output).Replace("-", "");
+    }
+    /// <summary>
+    /// 流，计算Crc 
+    /// 这个和Crc32.cs中的方法结果一致！
+    /// </summary>
+    /// <param name="pBuf"></param>
+    /// <returns></returns>
     public static uint CaclCRC(byte[] pBuf)
     {
         // Table of CRC-32's of all single byte values
@@ -297,102 +532,27 @@ public static class Utils
 
         uint c = 0xffffffff;  // begin at shift register contents 
         int i, n = pBuf.Length;
-        for(i = 0; i < n; i++)
+        for (i = 0; i < n; i++)
         {
             c = crctab[((int)c ^ pBuf[i]) & 0xff] ^ (c >> 8);
         }
         return c ^ 0xffffffff;
     }
+    #endregion
 
+    #region Transform相关
+
+    /// <summary>
+    /// 整体缩放
+    /// </summary>
+    /// <param name="tar"></param>
+    /// <param name="multi"></param>
+    /// <returns></returns>
     public static Vector3 GetScaledVector(this Vector3 tar, float multi)
     {
         return new Vector3(tar.x * multi, tar.y * multi, tar.z * multi);
     }
 
-    public static StringBuilder StrBuilder = new StringBuilder();
-
-    #region String
-    public static byte[] String2ByteDefault(string str)
-    {
-        return Encoding.Default.GetBytes(str);
-    }
-
-    public static string Byte2StringDefault(byte[] byt)
-    {
-        return Encoding.Default.GetString(byt);
-    }
-
-    public static byte[] String2ByteUTF8(string str)
-    {
-        return Encoding.UTF8.GetBytes(str);
-    }
-
-    public static string Byte2StringUTF8(byte[] byt)
-    {
-        if (null == byt)
-        {
-            return string.Empty;
-        }
-        return Encoding.UTF8.GetString(byt);
-    }
-    #endregion
-
-    public static string Time2String(string formart = "yyyy-MM-dd_HH.mm.ss")
-    {
-        return DateTime.Now.ToString(formart);
-    }
-
-    public static string GetStringSourceOrEmpty(string str)
-    {
-        if (string.IsNullOrEmpty(str))
-        {
-            return string.Empty;
-        }
-        else
-        {
-            return str;
-        }
-    }
-
-    public static bool IsStringNullOrEmptyOrDefault(string str, string strDefault = "null")
-    {
-        if (string.IsNullOrEmpty(str))
-        {
-            return true;
-        }
-        else
-        {
-            return str == strDefault;
-        }
-    }
-
-    /// <summary>
-    /// 之后可以和其他方法测试效率
-    /// </summary>
-    /// <param name="str"></param>
-    /// <returns></returns>
-    public static bool IsIntNumber(string str)
-    {
-        try
-        {
-            int.Parse(str);
-            return true;
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-    }
-
-    #region Math
-    public static int FloatCeilingToInt(float f)
-    {
-        return (int)Math.Ceiling((double)f);
-    }
-    #endregion Math
-
-
-    #region Unity
 
     /// <summary>
     /// 遍历Transform
@@ -418,91 +578,21 @@ public static class Utils
         }
     }
 
-    /// <summary>
-    /// need test
-    /// </summary>
-    /// <param name="posOrg"> execute with no change </param>
-    /// <param name="posTarget"></param>
-    /// <param name="distance"></param>
-    /// <returns></returns>
-    static Vector3 GetPositionMoveTowardsTarget(this Vector3 posOrg, Vector3 posTarget, float distance)
-    {
-        posOrg += (posTarget - posOrg).normalized * distance;
-        return posOrg;
-    }
+    #endregion
 
+    #region 系统时间相关
     /// <summary>
-    /// need test
+    /// 获取当前时间
     /// </summary>
-    /// <param name="posOrg">  execute with no change </param>
-    /// <param name="distance"></param>
+    /// <param name="formart"></param>
     /// <returns></returns>
-    static Vector3 GetPositionMoveTowardsMainCamera(this Vector3 posOrg, float distance)
+    public static string Time2String(string formart = "yyyy-MM-dd_HH.mm.ss")
     {
-        posOrg -= Camera.main.transform.forward * distance;
-        return posOrg;
+        return DateTime.Now.ToString(formart);
     }
     #endregion
 
-    #region File
-
-    public static byte[] LoadFile(FileInfo fInfo)
-    {
-        return LoadFile(fInfo.FullName);
-    }
-    public static byte[] LoadFile(string path) //@path)
-    {
-        if (File.Exists(path))
-        {
-            using (FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read))
-            {
-                //创建文件长度缓冲区
-                byte[] bytes = new byte[fileStream.Length];
-                fileStream.Seek(0, SeekOrigin.Begin);
-                //读取文件
-                fileStream.Read(bytes, 0, (int)fileStream.Length);
-                return bytes;
-            }
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    public static string LoadFile2String(string path)
-    {
-        if (File.Exists(path))
-        {
-            return File.ReadAllText(path);
-        }
-        else
-        {
-            return string.Empty;
-        }
-    }
-
-    
-
-    public static bool IsDirExists(string path)
-    {
-        return Directory.Exists(path);
-    }
-
-    public static bool IsFileExists(string path)
-    {
-        return File.Exists(path);
-    }
-
-    
-
-    public static string GetFileNameWithoutExtension(string path)
-    {
-        return Path.GetFileNameWithoutExtension(path);
-    }
-    #endregion
-
-    #region double float
+    #region double & float
     public static double TryParam(this double _dValue, string _strValue)
     {
         double d = 0;
@@ -515,6 +605,12 @@ public static class Utils
     }
     #endregion
 
+    #region 射线检测相关
+    /// <summary>
+    /// 获取鼠标点中的Mono对象
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static T GetMonoByMouse<T>() where T : MonoBehaviour
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -524,259 +620,6 @@ public static class Utils
             return rh.collider.GetComponentInParent<T>();
         }
         return null;
-    }
-    public static T GetMonoByMouse<T>(out RaycastHit rh) where T : MonoBehaviour
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        if (Physics.Raycast(ray, out rh, 99999f))
-        {
-            return rh.collider.GetComponentInParent<T>();
-        }
-        return null;
-    }
-
-    public static bool IsPic(string fileName)
-    {
-        string postFix = GetFilePostfix(fileName);
-        return postFix == "png"
-            || postFix == "PNG"
-            || postFix == "jpg"
-            || postFix == "JPG"
-            || postFix == "jpeg"
-            || postFix == "JPEG";
-    }
-
-    public static bool IsFbx(string fileName)
-    {
-        string postFix = GetFilePostfix(fileName);
-        return postFix.ToLower().Equals("fbx");
-    }
-
-    public static bool IsAB(string fileName)
-    {
-        string postFix = GetFilePostfix(fileName);
-        return postFix.ToLower().Equals("assetbundle");
-    }
-
-    /// <summary>添加进key-value(list)型字典, 并确保列表非空与不重复添加</summary>
-    /// <typeparam name="T1"></typeparam>
-    /// <typeparam name="T2"></typeparam>
-    /// <param name="dic"></param>
-    /// <param name="key"></param>
-    /// <param name="tar"></param>
-    /// <returns></returns>
-    public static Dictionary<T1, List<T2>> AddToList<T1, T2>(this Dictionary<T1, List<T2>> dic, T1 key, T2 tar)
-    {
-        if (!dic.ContainsKey(key))
-            dic.Add(key, new List<T2>());
-        List<T2> list = dic[key];
-        if (!list.Contains(tar))
-            list.Add(tar);
-        return dic;
-    }
-
-    public static List<T> Clone<T>(this List<T> list)
-    {
-        List<T> newList = new List<T>();
-        for (int iList = 0, nList = list.Count; iList < nList; iList++)
-        {
-            newList.Add(list[iList]);
-        }
-        return newList;
-    }
-
-    public static List<T> RemoveFromList<T>(this List<T> list, Predicate<T> pred, Action<T> operation = null)
-    {
-        List<T> deleteList = new List<T>();
-        for (int i = 0, length = list.Count; i < length; i++)
-        {
-            if (pred(list[i]))
-                deleteList.Add(list[i]);
-        }
-        for (int i = 0, length = deleteList.Count; i < length; i++)
-        {
-            list.Remove(deleteList[i]);
-            if (operation != null)
-                operation(deleteList[i]);
-        }
-        return list;
-    }
-
-    public static Dictionary<T1, T2> RemoveFromDic<T1, T2>(this Dictionary<T1, T2> dic, Predicate<T2> pred, Action<T2> operation = null)
-    {
-        Dictionary<T1, T2> deleteDic = new Dictionary<T1, T2>();
-        foreach (var key in dic.Keys)
-        {
-            deleteDic.AddRep(key, dic[key]);
-        }
-        foreach (var key in deleteDic.Keys)
-        {
-            dic.Remove(key);
-            operation(deleteDic[key]);
-        }
-
-        return dic;
-    }
-
-    /// <summary>替换/添加, 如果字典中已有则替换值</summary>
-    public static Dictionary<T1, T2> AddRep<T1, T2>(this Dictionary<T1, T2> dic, T1 key, T2 value)
-    {
-        if (dic.ContainsKey(key))
-            dic[key] = value;
-        else
-            dic.Add(key, value);
-        return dic;
-    }
-
-    /// <summary>获取法向量</summary>
-    public static Vector3 GetNormalVector(Vector3 va, Vector3 vb, Vector3 vc)
-    {
-        //平面方程Ax+BY+CZ+d=0 行列式计算
-        float A = va.y * vb.z + vb.y * vc.z + vc.y * va.z - va.y * vc.z - vb.y * va.z - vc.y * vb.z;
-        float B = -(va.x * vb.z + vb.x * vc.z + vc.x * va.z - vc.x * vb.z - vb.x * va.z - va.x * vc.z);
-        float C = va.x * vb.y + vb.x * vc.y + vc.x * va.y - va.x * vc.y - vb.x * va.y - vc.x * vb.y;
-        float D = -(va.x * vb.y * vc.z + vb.x * vc.y * va.z + vc.x * va.y * vb.z - va.x * vc.y * vb.z - vb.x * va.y * vc.z - vc.x * vb.y * va.z);
-        float E = Mathf.Sqrt(A * A + B * B + C * C);
-        Vector3 res = new Vector3(A / E, B / E, C / E);
-        return (res);
-    }
-
-    public static T FindItem<T>(this IEnumerable<T> enu, Predicate<T> judgeFunc)
-    {
-        foreach (var item in enu)
-        {
-            if (judgeFunc(item))
-                return item;
-        }
-        return default(T);
-    }
-    public static List<T> FindAllItem<T>(this IEnumerable<T> enu, Predicate<T> judgeFunc)
-    {
-        List<T> list = new List<T>();
-        foreach (var item in enu)
-        {
-            if (judgeFunc(item))
-                list.Add(item);
-        }
-        return list;
-    }
-    public static string GetStandardPath(string path)
-    {
-        int loopNum = 20;
-        path = path.Replace(@"\", @"/");
-        while (path.IndexOf(@"//") != -1)
-        {
-            path = path.Replace(@"//", @"/");
-            loopNum--;
-            if (loopNum < 0)
-            {
-                Debug.Log("路径清理失败: " + path);
-                return path;
-            }
-        }
-        return path;
-    }
-    #region 文件名操作
-    /// <summary>
-    /// 获取文件名
-    /// </summary>
-    /// <param name="path"></param>
-    /// <param name="needPostfix">是否需要带后缀</param>
-    /// <returns></returns>
-    public static string GetFileName(string path, bool needPostfix = false)
-    {
-        path = GetStandardPath(path);
-        string fileFolderPath = path.Substring(0, path.LastIndexOf(@"/") + 1);
-
-        string fileName = path.Substring(path.LastIndexOf("/") + 1, path.Length - fileFolderPath.Length);
-        if (needPostfix)
-            return fileName;
-        else
-            return fileName.Substring(0, fileName.LastIndexOf("."));
-    }
-    /// <summary>获取文件名后缀</summary>
-    public static string GetFilePostfix(string fileName)
-    {
-        if (fileName == null)
-            return null;
-        string res;
-        if (fileName.IndexOf(".") == -1)
-            res = "";
-        else
-        {
-            string[] ss = fileName.Split(new char[1] { '.' });
-            res = ss[ss.Length - 1];
-        }
-        return res;
-    }
-
-    /// <summary>
-    /// 去掉文件名前缀
-    /// </summary>
-    /// <param name="_strName"></param>
-    /// <returns></returns>
-    public static string GetPrefix(string _strName)
-    {
-        string strName = _strName;
-        int nIndex = strName.LastIndexOf('.');
-        if (nIndex > 0 && nIndex < strName.Length - 1)
-        {
-            strName = strName.Substring(0, strName.LastIndexOf('.'));
-        }
-
-        return strName;
-    }
-
-    #endregion
-
-
-    public static string GetFolderPath(string path, bool fullPath = true)
-    {
-        path = GetStandardPath(path);
-        if (fullPath)//获取全路径
-        {
-            if (path.LastIndexOf(@"/") == path.Length - 1)
-                return GetFolderPath(path.Substring(0, path.Length - 1));
-            else
-                return path.Substring(0, path.LastIndexOf(@"/") + 1);
-        }
-        else//获取父级文件夹名
-        {
-            string[] strArr = path.Split('/');
-
-            if (path.LastIndexOf(@"/") == path.Length - 1)
-                return strArr[strArr.Length - 2];
-            else
-                return strArr[strArr.Length - 1];
-        }
-    }
-
-    public static string GetParentFolderPath(string path, bool fullPath = true)
-    {
-        path = GetStandardPath(path);
-        if (fullPath)//获取全路径
-        {
-            if (path.LastIndexOf(@"/") == path.Length - 1)
-                return GetFolderPath(path.Substring(0, path.Length - 1));
-            else
-                return path.Substring(0, path.LastIndexOf(@"/") + 1);
-        }
-        else//获取父级文件夹名
-        {
-            string[] strArr = path.Split('/');
-            return strArr[strArr.Length - 2];
-        }
-    }
-
-
-    /// <summary>去除Unity实例化物体后添加的" (Instance)"字段</summary>
-    public static string RemovePostfix_Instance(string str)
-    {
-        string backstr = " (Instance)";
-        while (str.EndsWith(backstr))
-            str = str.Substring(0, str.Length - backstr.Length);
-        return str;
     }
 
     /// <summary>
@@ -804,489 +647,25 @@ public static class Utils
         return false;
     }
 
-}
-
-public static class JsonUtils
-{
-    public static JsonData EmptyJsonArray
+    /// <summary>
+    /// 获取鼠标点击位置
+    /// </summary>
+    /// <param name="_strGroundLay">检测层</param>
+    /// <returns></returns>
+    public static Vector3 GetWorldPosByMouse(string _strGroundLay)
     {
-        get
+        Vector3 vPos = Vector3.zero;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray,out hit,int.MaxValue,LayerMask.NameToLayer(_strGroundLay)))
         {
-            return JsonMapper.ToObject("[]");
+            vPos = hit.point;
         }
+        return vPos;
     }
-
-    public static JsonData EmptyJsonObject
-    {
-        get
-        {
-            return JsonMapper.ToObject("{}");
-        }
-    }
-
-    #region [LitJson]自动序列化
-
-    public static void FieldToJson(object tar, FieldInfo fi, JsonData jd, string paramName)
-    {
-        if (fi.FieldType == typeof(string))
-            jd[paramName] = fi.GetValue(tar) as string;
-        else if (fi.FieldType == typeof(int))
-            jd[paramName] = (int)fi.GetValue(tar);
-        else if (fi.FieldType == typeof(float))
-            jd[paramName] = (float)fi.GetValue(tar);
-        else if (fi.FieldType == typeof(bool))
-            jd[paramName] = (bool)fi.GetValue(tar);
-        else if (fi.FieldType == typeof(Vector3))
-            jd[paramName] = JsonUtils.vecToStr(((Vector3)fi.GetValue(tar)));
-        else if (fi.FieldType == typeof(Bounds))
-            jd[paramName] = ((Bounds)fi.GetValue(tar)).ToJsonData();
-    }
-
-    public static void JsonToField(object tar, FieldInfo fi, JsonData jd, string paramName)
-    {
-        if (fi.FieldType == typeof(string))
-            fi.SetValue(tar, jd.ReadString(paramName));
-        else if (fi.FieldType == typeof(int))
-            fi.SetValue(tar, jd.ReadInt(paramName));
-        else if (fi.FieldType == typeof(float))
-            fi.SetValue(tar, jd.ReadFloat(paramName));
-        else if (fi.FieldType == typeof(bool))
-            fi.SetValue(tar, jd.ReadBool(paramName));
-        else if (fi.FieldType == typeof(Vector3))
-            fi.SetValue(tar, jd.ReadVec3(paramName));
-        else if (fi.FieldType == typeof(Bounds))
-            fi.SetValue(tar, JsonToBounds(jd.ReadJsonData(paramName)));
-    }
-
     #endregion
 
-
-    /// <summary>读取文件中的json</summary>
-    public static JsonData ReadJsonFile(string path)
-    {
-        if (File.Exists(path))
-        {
-            //string str = File.ReadAllText(path);
-            string str = File.ReadAllText(path, System.Text.Encoding.UTF8);
-            try
-            {
-                return JsonMapper.ToObject(str);
-            }
-            catch (Exception e)
-            {
-                Debug.Log("读取Json失败" + path + "中的内容不是Json格式!!!");
-            }
-        }
-        else
-        {
-            Debug.Log("读取Json失败, 找到不文件: " + path);
-        }
-
-        return null;
-    }
-
-    public static UnityEngine.Color ReadColor(this JsonData jd, string key)
-    {
-        UnityEngine.Color color = UnityEngine.Color.white;
-        if (jd.Keys.Contains(key) && jd[key] != null)
-        {
-            string colorStr = jd.ReadString(key);
-            color = StringUtil.StringToColor4(colorStr);
-        }
-
-        return color;
-    }
-
-    public static float ReadFloat(this JsonData jd, string key, float defaultValue = 0)
-    {
-        float res;
-        if (jd.Keys.Contains(key) && jd[key] != null && float.TryParse(jd[key].ToString(), out res))
-            return res;
-        else
-            return defaultValue;
-    }
-    public static int ReadInt(this JsonData jd, string key, int defaultValue = 0)
-    {
-        int res;
-        if (jd.Keys.Contains(key) && jd[key] != null && int.TryParse(jd[key].ToString(), out res))
-            return res;
-        else
-            return defaultValue;
-    }
-
-    public static JsonData ReadJsonData(this JsonData jd, string key)
-    {
-        if (jd.Keys.Contains(key) && jd[key] != null)
-            return jd[key];
-        else
-            return null;
-    }
-
-    public static bool ReadBool(this JsonData jd, string key, bool defaultValue = false)
-    {
-        if (jd.Keys.Contains(key) && jd[key] != null)
-            return jd[key].ToString() == "true"
-                || jd[key].ToString() == "是"
-                || jd[key].ToString() == "True"
-                || jd[key].ToString() == "TRUE";
-        else
-            return defaultValue;
-    }
-
-    public static string ReadString(this JsonData jd, string key, string defaultValue = null)
-    {
-        if (jd.Keys.Contains(key) && jd[key] != null)
-            return jd[key].ToString();
-        else
-            return defaultValue;
-    }
-
-    public static Dictionary<T1, T2> ReadDic<T1, T2>(this JsonData jd, string key, Dictionary<T1, T2> defaultValue = null)
-    {
-
-        if (jd.Keys.Contains(key) && jd[key] != null)
-            return JsonMapper.ToObject<Dictionary<T1, T2>>(jd[key].ToJson());
-        else
-            return defaultValue;
-    }
-
-    #region writeJsonData
-    public static JsonData WriteJsonData(this JsonData jd, string key, int value)
-    {
-        jd[key] = int.Parse(value.ToString());
-        return jd;
-    }
-
-    public static JsonData WriteJsonData(this JsonData jd, string key, float value)
-    {
-        jd[key] = float.Parse(value.ToString());
-        return jd;
-    }
-
-    public static JsonData WriteJsonData(this JsonData jd, string key, string value)
-    {
-        jd[key] = value.ToString();
-        return jd;
-    }
-
-    public static JsonData WriteJsonData(this JsonData jd, string key, IJsonData value)
-    {
-        jd[key] = value.ToJsonData();
-        return jd;
-    }
-
-    public static JsonData WriteJsonData(this JsonData jd, string key, JsonData value)
-    {
-        jd[key] = value;
-        return jd;
-    }
-
-    #endregion
-
-
-    public static void DicChange(Dictionary<string, float> src, Dictionary<string, float> delta, bool isAdd)
-    {
-        foreach (var key in delta.Keys)
-        {
-            if (!src.ContainsKey(key))
-                src.Add(key, 0);
-            float change = isAdd ? delta[key] : -delta[key];
-            src[key] = src[key] + change;
-        }
-    }
-
-    #region dic.ToJsonData
-
-    public static JsonData ToJsonData(this Dictionary<string, int> dic)
-    {
-        JsonData jd = new JsonData();
-        if (dic.Keys.Count == 0)
-            jd = EmptyJsonObject;
-        else
-        {
-            foreach (var key in dic.Keys)
-            {
-                jd.WriteJsonData(key, dic[key]);
-            }
-        }
-        return jd;
-    }
-    public static JsonData ToJsonData(this Dictionary<string, float> dic)
-    {
-        JsonData jd = new JsonData();
-        if (dic.Keys.Count == 0)
-            jd = EmptyJsonObject;
-        else
-        {
-            foreach (var key in dic.Keys)
-            {
-                jd.WriteJsonData(key, dic[key]);
-            }
-        }
-        return jd;
-    }
-    public static JsonData ToJsonData(this Dictionary<string, string> dic)
-    {
-        JsonData jd = new JsonData();
-        if (dic.Keys.Count == 0)
-            jd = EmptyJsonObject;
-        else
-        {
-            foreach (var key in dic.Keys)
-            {
-                jd.WriteJsonData(key, dic[key]);
-            }
-        }
-        return jd;
-    }
-    public static JsonData ToJsonData<T2>(this Dictionary<string, T2> dic) where T2 : IJsonData
-    {
-        JsonData jd = new JsonData();
-        if (dic.Keys.Count == 0)
-            jd = EmptyJsonObject;
-        else
-        {
-            foreach (var key in dic.Keys)
-            {
-                jd.WriteJsonData(key, dic[key]);
-            }
-        }
-        return jd;
-    }
-    public static JsonData ToJsonData(this Dictionary<string, JsonData> dic)
-    {
-        JsonData jd = new JsonData();
-        if (dic.Keys.Count == 0)
-            jd = EmptyJsonObject;
-        else
-        {
-            foreach (var key in dic.Keys)
-            {
-                jd.WriteJsonData(key, dic[key]);
-            }
-        }
-        return jd;
-    }
-
-
-
-    #endregion
-
-    public static Vector3 ReadVec3(this JsonData jd, string key, Vector3 defaultValue = default(Vector3))
-    {
-        if (jd.Keys.Contains(key) && jd[key] != null)
-            return JsonToVec3(jd[key]);
-        else
-            return defaultValue;
-    }
-
-    public static Vector2 ReadVector2(this JsonData jd, string key, Vector2 defaultValue = default(Vector2))
-    {
-        if (jd.Keys.Contains(key) && jd[key] != null)
-            return StringUtil.StringToVector2(jd.ReadString(key));
-        else
-            return defaultValue;
-    }
-    public static Vector3 ReadVector3(this JsonData jd, string key, Vector3 defaultValue = default(Vector3))
-    {
-        if (jd.Keys.Contains(key) && jd[key] != null)
-            return StringUtil.StringToVector3(jd.ReadString(key));
-        else
-            return defaultValue;
-    }
-    public static Vector4 ReadVector4(this JsonData jd, string key, Vector4 defaultValue = default(Vector4))
-    {
-        if (jd.Keys.Contains(key) && jd[key] != null)
-            return StringUtil.StringToVector4(jd.ReadString(key));
-        else
-            return defaultValue;
-    }
-
-
-    public static T ReadEnum<T>(this JsonData jd, string key)
-    {
-        if (jd.Keys.Contains(key) && jd[key] != null)
-            return (T)Enum.Parse(typeof(T), jd[key].ToString(), true);
-        else
-            return default(T);
-    }
-
-    public static Vector3 JsonToVec3(JsonData jd)
-    {
-        return StringToVector3(jd.ToString());
-    }
-
-    public static Bounds JsonToBounds(JsonData jd)
-    {
-        return new Bounds(jd.ReadVec3("center"), jd.ReadVec3("size"));
-    }
-    public static JsonData ToJsonData(this Bounds bound)
-    {
-        JsonData jd = new JsonData();
-        jd["center"] = vecToStr(bound.center);
-        jd["size"] = vecToStr(bound.size);
-        return jd;
-    }
-
-    public static Vector3 StringToVector3(string str)
-    {
-        string[] floatArr = str.Split(new Char[] { ',' });
-        return new Vector3(float.Parse(floatArr[0]), float.Parse(floatArr[1]), float.Parse(floatArr[2]));
-    }
-
-    public static string vecToStr(Vector3 vec)
-    {
-        return vec.x.ToString("f3") + "," + vec.y.ToString("f3") + "," + vec.z.ToString("f3");
-    }
-
-
-    public static JsonData ToJsonData(this Rect rect)
-    {
-        JsonData jd = new JsonData();
-        jd["x"] = rect.x;
-        jd["y"] = rect.y;
-        jd["width"] = rect.width;
-        jd["height"] = rect.height;
-        return jd;
-    }
-
-    public static JsonData ToJsonData(object obj)
-    {
-        return JsonMapper.ToObject(JsonMapper.ToJson(obj));
-    }
-
-    public static T ToItemVO<T>(this JsonData jd) where T : new()
-    {
-        //判断T是否是IJsonData, 若是则用ReadJsonData解析
-        T tar = new T();
-        bool tt = tar is IJsonData;
-        if (tar is IJsonData)
-        {
-            (tar as IJsonData).ReadJsonData(jd);
-            return tar;
-        }
-        else
-            return JsonMapper.ToObject<T>(JsonMapper.ToJson(jd));
-    }
-
-    public static List<T> ToItemVOList<T>(this JsonData jd) where T : new()
-    {
-        List<T> list = new List<T>();
-        for (int i = 0, length = jd.Count; i < length; i++)
-        {
-            list.Add(ToItemVO<T>(jd[i]));
-        }
-        return list;
-    }
-
-    public static List<Vector3> ToVec3List(this JsonData jd)
-    {
-        List<Vector3> list = new List<Vector3>();
-        for (int i = 0, length = jd.Count; i < length; i++)
-        {
-            list.Add(JsonToVec3(jd[i]));
-        }
-        return list;
-    }
-    public static List<string> ToStringList(this JsonData jd)
-    {
-        List<string> list = new List<string>();
-        for (int i = 0, length = jd.Count; i < length; i++)
-        {
-            list.Add(jd[i].ToString());
-        }
-        return list;
-    }
-
-    public static List<Bounds> ToBoundsList(this JsonData jd)
-    {
-        List<Bounds> list = new List<Bounds>();
-        for (int i = 0, length = jd.Count; i < length; i++)
-        {
-            list.Add(JsonToBounds(jd[i]));
-        }
-        return list;
-    }
-
-    public static JsonData ToJsonDataList<T>(this ICollection<T> list) where T : IJsonData
-    {
-        JsonData jd = ToJsonData(new List<int>());
-        foreach (var item in list)
-        {
-            jd.Add((item as IJsonData).ToJsonData());
-        }
-        return jd;
-    }
-
-    public static JsonData ToJsonDataDic<T1, T2>(this Dictionary<T1, T2> dic) where T2 : IJsonData
-    {
-        JsonData jd = new JsonData();
-        foreach (var pair in dic)
-        {
-            string key = pair.Key.ToString();
-            JsonData value = pair.Value.ToJsonData();
-            jd[key] = value;
-        }
-        return jd;
-    }
-
-    public static bool SetJsonProp<T>(object tar, JsonData jd, string propName, string jsonKey, Func<JsonData, T> dataProcess = null)
-    {
-        if (jd.Keys.Contains(jsonKey))
-        {
-            JsonData valueJD = jd[jsonKey];
-            PropertyInfo prop = null;
-            foreach (PropertyInfo p in tar.GetType().GetProperties())
-            {
-                if (p.Name == propName)
-                {
-                    prop = p;
-                    break;
-                }
-            }
-            if (prop != null)
-            {
-                if (dataProcess == null)
-                {
-                    if (typeof(T) == typeof(string))
-                        prop.SetValue(tar, JsonMapper.ToJson(valueJD), null);
-                    else if (typeof(T) == typeof(int))
-                        prop.SetValue(tar, int.Parse(JsonMapper.ToJson(valueJD)), null);
-                    else if (typeof(T) == typeof(float))
-                        prop.SetValue(tar, float.Parse(JsonMapper.ToJson(valueJD)), null);
-                    else if (typeof(T) == typeof(Vector3))
-                        prop.SetValue(tar, JsonToVec3(valueJD), null);
-                    else
-                    {
-                        //Debug.Log("SetJsonProp failed! no fitful default dataProcess(string, int, float, Vector3 ) ");
-                        return false;
-                    }
-                }
-                else
-                    prop.SetValue(tar, dataProcess(valueJD), null);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        else
-        {
-            //Debug.Log("SetJsonProp failed! can not find jsonKey: [" + jsonKey + "] in JsonData : \r\n"+JsonMapper.ToJson(jd));
-            return false;
-        }
-
-    }
-}
-public interface IJsonData
-{
-    JsonData ToJsonData();
-    IJsonData ReadJsonData(JsonData jd);
-}
-
-public static class DictionaryExtention
-{
+    #region Dictionary扩展
     /// <summary>
     /// 尝试直接通过key直接获取TValue的值 : 如果不存在, 返回defaultValue
     /// </summary>
@@ -1381,4 +760,149 @@ public static class DictionaryExtention
         }
         return dict;
     }
+    /// <summary>添加进key-value(list)型字典, 并确保列表非空与不重复添加</summary>
+    /// <typeparam name="T1"></typeparam>
+    /// <typeparam name="T2"></typeparam>
+    /// <param name="dic"></param>
+    /// <param name="key"></param>
+    /// <param name="tar"></param>
+    /// <returns></returns>
+    public static Dictionary<T1, List<T2>> AddToList<T1, T2>(this Dictionary<T1, List<T2>> dic, T1 key, T2 tar)
+    {
+        if (!dic.ContainsKey(key))
+            dic.Add(key, new List<T2>());
+        List<T2> list = dic[key];
+        if (!list.Contains(tar))
+            list.Add(tar);
+        return dic;
+    }
+
+    public static Dictionary<T1, T2> RemoveFromDic<T1, T2>(this Dictionary<T1, T2> dic, Predicate<T2> pred, Action<T2> operation = null)
+    {
+        Dictionary<T1, T2> deleteDic = new Dictionary<T1, T2>();
+        foreach (var key in dic.Keys)
+        {
+            deleteDic.AddRep(key, dic[key]);
+        }
+        foreach (var key in deleteDic.Keys)
+        {
+            dic.Remove(key);
+            operation(deleteDic[key]);
+        }
+
+        return dic;
+    }
+
+    /// <summary>替换/添加, 如果字典中已有则替换值</summary>
+    public static Dictionary<T1, T2> AddRep<T1, T2>(this Dictionary<T1, T2> dic, T1 key, T2 value)
+    {
+        if (dic.ContainsKey(key))
+            dic[key] = value;
+        else
+            dic.Add(key, value);
+        return dic;
+    }
+    #endregion
+
+    #region List 扩展
+
+    public static List<T> Clone<T>(this List<T> list)
+    {
+        List<T> newList = new List<T>();
+        for (int iList = 0, nList = list.Count; iList < nList; iList++)
+        {
+            newList.Add(list[iList]);
+        }
+        return newList;
+    }
+
+    public static List<T> RemoveFromList<T>(this List<T> list, Predicate<T> pred, Action<T> operation = null)
+    {
+        List<T> deleteList = new List<T>();
+        for (int i = 0, length = list.Count; i < length; i++)
+        {
+            if (pred(list[i]))
+                deleteList.Add(list[i]);
+        }
+        for (int i = 0, length = deleteList.Count; i < length; i++)
+        {
+            list.Remove(deleteList[i]);
+            if (operation != null)
+                operation(deleteList[i]);
+        }
+        return list;
+    }
+
+    public static T FindItem<T>(this IEnumerable<T> enu, Predicate<T> judgeFunc)
+    {
+        foreach (var item in enu)
+        {
+            if (judgeFunc(item))
+                return item;
+        }
+        return default(T);
+    }
+    public static List<T> FindAllItem<T>(this IEnumerable<T> enu, Predicate<T> judgeFunc)
+    {
+        List<T> list = new List<T>();
+        foreach (var item in enu)
+        {
+            if (judgeFunc(item))
+                list.Add(item);
+        }
+        return list;
+    }
+    #endregion
+
+    #region Math
+
+    /// <summary>获取法向量</summary>
+    public static Vector3 GetNormalVector(Vector3 va, Vector3 vb, Vector3 vc)
+    {
+        //平面方程Ax+BY+CZ+d=0 行列式计算
+        float A = va.y * vb.z + vb.y * vc.z + vc.y * va.z - va.y * vc.z - vb.y * va.z - vc.y * vb.z;
+        float B = -(va.x * vb.z + vb.x * vc.z + vc.x * va.z - vc.x * vb.z - vb.x * va.z - va.x * vc.z);
+        float C = va.x * vb.y + vb.x * vc.y + vc.x * va.y - va.x * vc.y - vb.x * va.y - vc.x * vb.y;
+        float D = -(va.x * vb.y * vc.z + vb.x * vc.y * va.z + vc.x * va.y * vb.z - va.x * vc.y * vb.z - vb.x * va.y * vc.z - vc.x * vb.y * va.z);
+        float E = Mathf.Sqrt(A * A + B * B + C * C);
+        Vector3 res = new Vector3(A / E, B / E, C / E);
+        return (res);
+    }
+
+    #endregion
+
+    #region Unity相关
+    /// <summary>去除Unity实例化物体后添加的" (Instance)"字段</summary>
+    public static string RemovePostfix_Instance(string str)
+    {
+        string backstr = " (Instance)";
+        while (str.EndsWith(backstr))
+            str = str.Substring(0, str.Length - backstr.Length);
+        return str;
+    }
+
+    #endregion
+
+    #region UGUI相关
+    /// <summary>
+    /// 判断鼠标是否在UI上
+    /// </summary>
+    /// <returns></returns>
+    public static bool IsUI()
+    {
+        Vector2 screenPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+
+        //实例化点击事件
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        //将点击位置的屏幕坐标赋值给点击事件
+        eventDataCurrentPosition.position = new Vector2(screenPosition.x, screenPosition.y);
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        //向点击处发射射线
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+
+        return results.Count > 0;
+    }
+
+    #endregion
 }

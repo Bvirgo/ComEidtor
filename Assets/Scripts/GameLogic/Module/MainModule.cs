@@ -31,26 +31,31 @@ public class MainModule : BaseModule {
     protected override void OnLoad()
     {
         base.OnLoad();
+
+        InitData();
+
+        Register();
+    }
+
+    private void Register()
+    {
+        MessageCenter.Instance.AddListener(MsgType.MainView_Show, OnInit);
+        MessageCenter.Instance.AddListener(MsgType.MainView_ReplaceAll, OnReplaceAll);
+        MessageCenter.Instance.AddListener(MsgType.MainView_TagItemClick, TagItemClick);
+        MessageCenter.Instance.AddListener(MsgType.MainView_ComItemClick, ComItemClick);
+        MessageCenter.Instance.AddListener(MsgType.MainView_LoadRes, LoadRes);
+        MessageCenter.Instance.AddListener(MsgType.MainView_NewComp, NewComp);
+        MessageCenter.Instance.AddListener(MsgType.MainView_Save, SaveToServer);
+    }
+
+    private void InitData()
+    {
         m_objRoot = GameObject.Find("ComModelRoot");
         if (m_objRoot == null)
         {
             m_objRoot = new GameObject();
             m_objRoot.name = "ComModelRoot";
         }
-
-        InitData();
-
-        MessageCenter.Instance.AddListener(MsgType.MainView_Show, OnInit);
-        MessageCenter.Instance.AddListener(MsgType.MainView_ReplaceAll, OnReplaceAll);
-        MessageCenter.Instance.AddListener(MsgType.MainView_TagItemClick, TagItemClick);
-        MessageCenter.Instance.AddListener(MsgType.MainView_ComItemClick, ComItemClick);
-        MessageCenter.Instance.AddListener(MsgType.MainView_LoadRes,LoadRes);
-        MessageCenter.Instance.AddListener(MsgType.MainView_NewComp,NewComp);
-        MessageCenter.Instance.AddListener(MsgType.MainView_Save,SaveToServer);
-    }
-
-    private void InitData()
-    {
         m_pComProperty = new List<ComProperty>();
         m_jdFbx = JsonUtils.EmptyJsonArray;
         m_jErrorComp = JsonUtils.EmptyJsonArray;
@@ -64,6 +69,12 @@ public class MainModule : BaseModule {
     protected override void OnRelease()
     {
         base.OnRelease();
+
+        UnRegister();
+    }
+
+    private void UnRegister()
+    {
         MessageCenter.Instance.RemoveListener(MsgType.MainView_Show, OnInit);
         MessageCenter.Instance.RemoveListener(MsgType.MainView_ReplaceAll, OnReplaceAll);
         MessageCenter.Instance.RemoveListener(MsgType.MainView_TagItemClick, TagItemClick);

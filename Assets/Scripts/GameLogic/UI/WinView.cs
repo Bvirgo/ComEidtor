@@ -102,11 +102,6 @@ public class WinView : BaseUI {
         ShowInfo();
     }
 
-    private void InitData()
-    {
-
-    }
-
     private void RegisterMessage()
     {
         MessageCenter.Instance.AddListener(MsgType.Win_Refresh,RefreshInfo);
@@ -117,6 +112,10 @@ public class WinView : BaseUI {
         MessageCenter.Instance.RemoveListener(MsgType.Win_Refresh, RefreshInfo);
     }
 
+    /// <summary>
+    /// 刷新
+    /// </summary>
+    /// <param name="_msg"></param>
     private void RefreshInfo(Message _msg)
     {
 
@@ -145,6 +144,9 @@ public class WinView : BaseUI {
         ShowInfo();
     }
 
+    /// <summary>
+    /// 显示信息
+    /// </summary>
     private void ShowInfo()
     {
         if (m_strType.Equals(Defines.AlertType_Single))
