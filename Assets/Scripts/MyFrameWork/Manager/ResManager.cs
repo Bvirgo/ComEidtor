@@ -430,14 +430,14 @@ namespace MyFrameWork
                 if (m_pErrorNode.Count > 0)
                 {
                     string strTips = string.Format("资源上传失败个数：{0} /n点击【确定】按钮，失败重传！", m_pErrorNode.Count);
-                    LogicMgr.Instance.OnAlert(strTips, "组件上传结果", () => {
+                    LogicUtils.Instance.OnAlert(strTips, "组件上传结果", () => {
                         m_qUpdate = new Queue<IResourceNode>(m_pErrorNode);
                         UpdateToServer(_cb,_eCb);
                     });
                 }
                 else
                 {
-                    LogicMgr.Instance.OnAlert("资源上传完成！");
+                    LogicUtils.Instance.OnAlert("资源上传完成！");
                     _cb();
                 }
 
@@ -446,7 +446,7 @@ namespace MyFrameWork
 
         private void PopWaiting()
         {
-            LogicMgr.Instance.OnPopWaiting(1);
+            LogicUtils.Instance.OnPopWaiting(1);
         }
 
         /// <summary>
@@ -468,7 +468,7 @@ namespace MyFrameWork
 
             if (m_qUpdate.Count > 0)
             {
-                LogicMgr.Instance.OnShowWaiting(1, "资源上传中...",false,m_qUpdate.Count);
+                LogicUtils.Instance.OnShowWaiting(1, "资源上传中...",false,m_qUpdate.Count);
                 UpdateToServer(_cb,_eCb);
             }
             else

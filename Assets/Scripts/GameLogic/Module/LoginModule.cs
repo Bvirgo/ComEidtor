@@ -34,7 +34,7 @@ public class LoginModule : BaseModule {
         string strPsw = _msg["psw"].ToString();
 
         Message msg;
-        LogicMgr.Instance.OnShowWaiting(1, "Login...",true);
+        LogicUtils.Instance.OnShowWaiting(1, "Login...",true);
 
         HttpService.Login(strUser, strPsw, (success, resp) =>
         {       
@@ -52,7 +52,7 @@ public class LoginModule : BaseModule {
                 Debug.LogError("登录失败："+resp.Error);
             }
 
-            LogicMgr.Instance.OnHideWaiting();
+            LogicUtils.Instance.OnHideWaiting();
         });
     }
     #endregion

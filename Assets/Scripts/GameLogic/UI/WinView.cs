@@ -52,9 +52,16 @@ public class WinView : BaseUI {
 
         RegisterMessage();
 
+        InitData();
+
+        ShowInfo();
+    }
+
+    private void InitData()
+    {
         m_objItemPrefab = ResManager.Instance.Load("Prefabs/UI/InfoItem") as GameObject;
 
-        btn_cancel.onClick.AddListener(()=> {
+        btn_cancel.onClick.AddListener(() => {
             Close();
             if (m_cancelCb != null)
             {
@@ -62,12 +69,12 @@ public class WinView : BaseUI {
             }
         });
 
-        btn_close.onClick.AddListener(()=> 
+        btn_close.onClick.AddListener(() =>
         {
             Close();
         });
 
-        btn_ok.onClick.AddListener(()=> {
+        btn_ok.onClick.AddListener(() => {
             if (m_okCb != null)
             {
                 m_okCb();
@@ -94,12 +101,10 @@ public class WinView : BaseUI {
         m_okCb = this.uiParams[3] as Action;
 
         m_cancelCb = this.uiParams[4] as Action;
-        if (m_okCb== null)
+        if (m_okCb == null)
         {
             m_okCb = Close;
         }
-
-        ShowInfo();
     }
 
     private void RegisterMessage()
@@ -181,7 +186,7 @@ public class WinView : BaseUI {
                 Text txt = objItem.GetComponent<Text>();
                 txt.text = aif.m_strInfo;
                 btn.onClick.AddListener(()=> {
-                    aif.m_cb();
+                    aif.m_cb(aif);
                 });
             }
         }

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MyFrameWork
 {
-    public class LogicMgr : Singleton<LogicMgr>
+    public class LogicUtils : Singleton<LogicUtils>
     {
         #region Init
         Dictionary<string, Texture2D> imgCrc_img;
@@ -16,7 +16,15 @@ namespace MyFrameWork
             imgCrc_img = new Dictionary<string, Texture2D>();
         }
         #endregion
+
         #region WaitingPanel
+        /// <summary>
+        /// 加载等待
+        /// </summary>
+        /// <param name="_nID">ID</param>
+        /// <param name="_strTips">Tips</param>
+        /// <param name="_bClock">Is Clock?</param>
+        /// <param name="_nMax">Max Value</param>
         public void OnShowWaiting(int _nID, string _strTips, bool _bClock = false, int _nMax = 99)
         {
             Message msg = new Message(MsgType.Com_ShowWaiting, this);
@@ -34,6 +42,10 @@ namespace MyFrameWork
             msg.Send();
         }
 
+        /// <summary>
+        /// 进度+1
+        /// </summary>
+        /// <param name="_nID"></param>
         public void OnPushWaiting(int _nID)
         {
             Message msg = new Message(MsgType.Com_PushWaiting, this);
@@ -41,6 +53,9 @@ namespace MyFrameWork
             msg.Send();
         }
 
+        /// <summary>
+        /// 关闭加载界面
+        /// </summary>
         public void OnHideWaiting()
         {
             Message msg = new Message(MsgType.Com_HideWaiting, this);
@@ -133,9 +148,10 @@ namespace MyFrameWork
         /// 提示框
         /// </summary>
         /// <param name="_content">内容</param>
-        /// <param name="_strType">类型</param>
+        /// <param name="_strType">类型(单一提示，列表提示)</param>
         /// <param name="_strTitle">标题</param>
         /// <param name="_cb">确认回调</param>
+        /// <param name="_cancelCb">取消回调</param>
         public void OnAlert(object _content, string _strTitle = "提示框", Action _cb = null, Action _cancelCb = null,string _strType = Defines.AlertType_Single)
         {
             Message msg = new Message(MsgType.Win_Show, this);

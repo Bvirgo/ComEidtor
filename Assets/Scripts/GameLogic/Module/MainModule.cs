@@ -110,12 +110,12 @@ public class MainModule : BaseModule {
         m_pUpdateErComp = new List<CompConfigData>();
         m_pMemeryRes = new List<IResourceNode>();
 
-        List<string> pResPaths = LogicMgr.Instance.OnImportFiles();
+        List<string> pResPaths = LogicUtils.Instance.OnImportFiles();
         if (pResPaths.Count > 0)
         {
             m_qResPaths = new Queue<string>(pResPaths);
 
-            LogicMgr.Instance.OnShowWaiting(2, "Fbx加载中...", false, m_qResPaths.Count);
+            LogicUtils.Instance.OnShowWaiting(2, "Fbx加载中...", false, m_qResPaths.Count);
 
             LoadResToMemory();
         }
@@ -123,7 +123,7 @@ public class MainModule : BaseModule {
 
     private void PopWaiting()
     {
-        LogicMgr.Instance.OnPopWaiting(2);
+        LogicUtils.Instance.OnPopWaiting(2);
     }
 
     IEnumerator test(string _strPath, Action _cb)
@@ -347,7 +347,7 @@ public class MainModule : BaseModule {
     {
         tag_comPropertys.Clear();
         m_pComProperty.Clear();
-        LogicMgr.Instance.RemoveChildren(m_objRoot.transform);
+        LogicUtils.Instance.RemoveChildren(m_objRoot.transform);
 
         // 加载组件配置
         LoadCompConfig((js) => {
@@ -455,7 +455,7 @@ public class MainModule : BaseModule {
             if (m_pUpdateErComp.Count > 0)
             {
                 string strTips = string.Format("组件上传失败个数：{0} /n点击【确定】按钮，失败重传！", m_pUpdateErComp.Count);
-                LogicMgr.Instance.OnAlert(strTips, "组件上传结果", () => {
+                LogicUtils.Instance.OnAlert(strTips, "组件上传结果", () => {
                     m_qUpdateComp = new Queue<CompConfigData>(m_pUpdateErComp);
                     UpdateCompConfig(_cb);
                 });
@@ -466,7 +466,7 @@ public class MainModule : BaseModule {
                 {
                     _cb();
                 }
-                LogicMgr.Instance.OnAlert("组件配置上传完成！");
+                LogicUtils.Instance.OnAlert("组件配置上传完成！");
             }
         }
     }
@@ -587,12 +587,12 @@ public class MainModule : BaseModule {
     {
         if (m_currentCom == null)
         {
-            LogicMgr.Instance.OnAlert("没有选中任何组件，不能导入资源！");
+            LogicUtils.Instance.OnAlert("没有选中任何组件，不能导入资源！");
             return;
         }
 
         MainView mv = _msg.Sender as MainView;
-        string strPath = LogicMgr.Instance.OnImportOneFile();
+        string strPath = LogicUtils.Instance.OnImportOneFile();
         string strFileName = Utils.GetFileName(strPath).ToLower();
         //Debug.LogWarning("当前文件路径："+strPath+"--文件名:"+strFileName);
         string strFilePostName = Utils.GetFilePostfix(strPath).ToLower();
@@ -603,7 +603,7 @@ public class MainModule : BaseModule {
         {
             if (!m_currentCom.m_strCode.ToLower().Equals(strFileName))
             {
-                LogicMgr.Instance.OnAlert("资源名和组件Code不一致，不能导入资源!");
+                LogicUtils.Instance.OnAlert("资源名和组件Code不一致，不能导入资源!");
                 return;
             }
         }
@@ -669,11 +669,11 @@ public class MainModule : BaseModule {
     /// <param name="_strName"></param>
     private void CreateNewModel(GameObject _go,string _strName)
     {
-        LogicMgr.Instance.RemoveChildren(m_objRoot.transform);
+        LogicUtils.Instance.RemoveChildren(m_objRoot.transform);
 
         GameObject compObj = new GameObject();
         compObj.name = _strName;
-        LogicMgr.ResetStandardShader(_go);
+        LogicUtils.ResetStandardShader(_go);
         _go.transform.SetParent(compObj.transform);
         _go.transform.position = Vector3.zero;
         _go.transform.localScale = Vector3.one;
@@ -740,7 +740,7 @@ public class MainModule : BaseModule {
         }
         else
         {
-            LogicMgr.Instance.OnAlert("组件保存条件不满足！");
+            LogicUtils.Instance.OnAlert("组件保存条件不满足！");
         }
     }
 

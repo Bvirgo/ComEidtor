@@ -7,17 +7,17 @@ public class WaitingModule : BaseModule {
     private bool m_bShowWaiting;
     private Queue<int> m_qMsg;
     private int m_curMsgKey;
-    private Dictionary<int, MsgInfo> key_msgs;
+    private Dictionary<int, WaitingMsgInfo> key_msgs;
     private int m_nTotal;
     private int m_nCurrent;
-    private class MsgInfo
+    private class WaitingMsgInfo
     {
         public Message msg;
         public int nTotal;
         public int nCurrent;
         public bool bFinished;
 
-        public MsgInfo(Message _msg)
+        public WaitingMsgInfo(Message _msg)
         {
             msg = _msg;
             nTotal = 1;
@@ -34,22 +34,28 @@ public class WaitingModule : BaseModule {
     protected override void OnLoad()
     {
         base.OnLoad();
-        Init();
 
+        InitData();
+
+        RegisterMessage();
+    }
+
+    private void InitData()
+    {
+        m_bShowWaiting = false;
+        m_qMsg = new Queue<int>();
+        key_msgs = new Dictionary<int, WaitingMsgInfo>();
+
+        m_nTotal = 1;
+        m_nCurrent = 0;
+    }
+
+    private void RegisterMessage()
+    {
         MessageCenter.Instance.AddListener(MsgType.Com_PopWaiting, PopWaiting);
         MessageCenter.Instance.AddListener(MsgType.Com_PushWaiting, PushWaiting);
         MessageCenter.Instance.AddListener(MsgType.Com_ShowWaiting, ShowWaiting);
         MessageCenter.Instance.AddListener(MsgType.Com_HideWaiting, Hide);
-    }
-
-    private void Init()
-    {
-        m_bShowWaiting = false;
-        m_qMsg = new Queue<int>();
-        key_msgs = new Dictionary<int, MsgInfo>();
-
-        m_nTotal = 1;
-        m_nCurrent = 0;
     }
 
     protected override void OnRelease()
@@ -72,7 +78,7 @@ public class WaitingModule : BaseModule {
             {
                 return;
             }
-            MsgInfo mInfo = key_msgs[nId];
+            WaitingMsgInfo mInfo = key_msgs[nId];
             mInfo.nTotal = nTotal;
 
             key_msgs[nId] = mInfo;
@@ -94,7 +100,7 @@ public class WaitingModule : BaseModule {
             {
                 return;
             }
-            MsgInfo mInfo = key_msgs[nId];
+            WaitingMsgInfo mInfo = key_msgs[nId];
 
             m_nCurrent = mInfo.nCurrent;
 
@@ -140,7 +146,7 @@ public class WaitingModule : BaseModule {
             {
                 return;
             }
-            MsgInfo mInfo = key_msgs[nId];
+            WaitingMsgInfo mInfo = key_msgs[nId];
             m_nTotal = mInfo.nTotal;
             mInfo.nTotal = ++m_nTotal;
 
@@ -177,7 +183,7 @@ public class WaitingModule : BaseModule {
         }
 
         int nId = _msg["id"] != null ? (int)_msg["id"] : 0;
-        MsgInfo mInfo = new MsgInfo(_msg);
+        WaitingMsgInfo mInfo = new WaitingMsgInfo(_msg);
 
         key_msgs.AddOrReplace(nId, mInfo);
 
@@ -203,7 +209,7 @@ public class WaitingModule : BaseModule {
         if (m_qMsg.Count > 0)
         {
             int nKey = (int)m_qMsg.Dequeue();
-            MsgInfo mInfo = key_msgs[nKey];
+            WaitingMsgInfo mInfo = key_msgs[nKey];
             if (mInfo.bFinished)
             {
                 LoadWaitingView();
@@ -231,7 +237,7 @@ public class WaitingModule : BaseModule {
     {
         if (m_bShowWaiting)
         {
-            Init();
+            InitData();
             LoadWaitingView();
         }
     }

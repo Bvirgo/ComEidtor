@@ -108,8 +108,8 @@ public class MainView : BaseUI {
         m_pTags = _msg["tags"] as List<string>;
         int nLength = m_nTag * m_pTags.Count;
 
-        LogicMgr.Instance.RemoveChildren(tagGrid);
-        LogicMgr.Instance.RemoveChildren(comGrid);
+        LogicUtils.Instance.RemoveChildren(tagGrid);
+        LogicUtils.Instance.RemoveChildren(comGrid);
         InitUI();
 
         RectTransform rtf = tagGrid.GetComponent<RectTransform>();
@@ -149,7 +149,7 @@ public class MainView : BaseUI {
 
         int nLength = m_nComp * m_pComProperty.Count;
 
-        LogicMgr.Instance.RemoveChildren(comGrid);
+        LogicUtils.Instance.RemoveChildren(comGrid);
 
         RectTransform rtf = comGrid.GetComponent<RectTransform>();
         rtf.sizeDelta = new Vector2(nLength, rtf.sizeDelta.y);
@@ -176,7 +176,7 @@ public class MainView : BaseUI {
             string strTips = string.Format("Code:{0}", cpp.m_strCode);
             Text txt = comItem.GetComponentInChildren<Text>();
             txt.text = strTips;
-            LogicMgr.Instance.OnGetTexture(cpp.m_strImg, cpp.m_strImgCrc, (_tx) => {
+            LogicUtils.Instance.OnGetTexture(cpp.m_strImg, cpp.m_strImgCrc, (_tx) => {
                 if (img != null)
                 {
                     img.sprite = Sprite.Create(_tx, new Rect(0, 0, _tx.width, _tx.height), Vector2.zero);
@@ -197,7 +197,7 @@ public class MainView : BaseUI {
         ipt_tag.text = _cpp.m_strTag;
         txt_imgName.text = _cpp.m_strImg;
         txt_file.text = _cpp.m_strModelName;
-        LogicMgr.Instance.OnGetTexture(_cpp.m_strImg, _cpp.m_strImgCrc, (_tx) => {
+        LogicUtils.Instance.OnGetTexture(_cpp.m_strImg, _cpp.m_strImgCrc, (_tx) => {
             img_com.sprite = Sprite.Create(_tx, new Rect(0, 0, _tx.width, _tx.height), Vector2.zero);
         });
     }

@@ -85,5 +85,5 @@ public class AlertInfo
 {
     public int m_nId;
     public string m_strInfo;
-    public Action m_cb;
+    public Action<AlertInfo> m_cb;
 }
