@@ -71,12 +71,12 @@ public static class Utils
     }
 
     /// <summary>
-    /// 获取文件名
+    /// 通过全路径，获取文件名（去掉后缀）
     /// </summary>
     /// <param name="path"></param>
     /// <param name="needPostfix">是否需要带后缀</param>
     /// <returns></returns>
-    public static string GetFileName(string path, bool needPostfix = false)
+    public static string GetFileNameByPath(string path, bool needPostfix = false)
     {
         path = GetStandardPath(path);
         string fileFolderPath = path.Substring(0, path.LastIndexOf(@"/") + 1);
@@ -104,11 +104,11 @@ public static class Utils
     }
 
     /// <summary>
-    /// 去掉文件名前缀
+    /// 去掉文件名后缀
     /// </summary>
     /// <param name="_strName"></param>
     /// <returns></returns>
-    public static string GetPrefix(string _strName)
+    public static string GetFilePrefix(string _strName)
     {
         string strName = _strName;
         int nIndex = strName.LastIndexOf('.');

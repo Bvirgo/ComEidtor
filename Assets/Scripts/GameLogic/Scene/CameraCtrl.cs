@@ -87,6 +87,12 @@ public class CameraCtrl : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (Utils.IsUI())
+        {
+            //Debug.LogWarning("Is Ui................");
+            return;
+        }
+
         if (CameraState == EnumCameraState.normal)
             FocusDistanceCtrl();
         CameraRotate();

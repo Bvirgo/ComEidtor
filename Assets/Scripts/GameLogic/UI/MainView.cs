@@ -35,6 +35,8 @@ public class MainView : BaseUI {
     public Text txt_file;
     [HideInInspector, AutoUGUI]
     public Button btn_new;
+    [HideInInspector, AutoUGUI]
+    public Button btn_ok;
 
     private int m_nTag = 105;
     private int m_nComp = 140;
@@ -55,36 +57,53 @@ public class MainView : BaseUI {
 
     void Start()
     {
+        InitData();
+
+        RegisterMessage();
+    }
+
+    private void RegisterMessage()
+    {
+        MessageCenter.Instance.AddListener(MsgType.MainView_RefreshTag, CreateTagList);
+        MessageCenter.Instance.AddListener(MsgType.MainView_RefreshCom, RefreshComList);
+    }
+
+    private void InitData()
+    {
         m_objComPrefabs = ResManager.Instance.Load("Prefabs/UI/CompItem") as GameObject;
         m_objTagPrefabs = ResManager.Instance.Load("Prefabs/UI/TagItem") as GameObject;
 
-        InitUI();
-
-        MessageCenter.Instance.AddListener(MsgType.MainView_RefreshTag,CreateTagList);
-        MessageCenter.Instance.AddListener(MsgType.MainView_RefreshCom,RefreshComList);
-  
-
-        btn_load.onClick.AddListener(()=> 
+        btn_load.onClick.AddListener(() =>
         {
-            Message msg = new Message(MsgType.MainView_LoadRes,this);
+            Message msg = new Message(MsgType.MainView_LoadRes, this);
             msg.Send();
         });
-        btn_save.onClick.AddListener(()=> {
+        btn_save.onClick.AddListener(() => {
             Message msg = new Message(MsgType.MainView_Save, this);
             msg["tag"] = ipt_tag.text;
             msg["name"] = ipt_comName.text;
             msg.Send();
         });
-        btn_mutiReplace.onClick.AddListener(()=> {
+        btn_mutiReplace.onClick.AddListener(() => {
             Message msg = new Message(MsgType.MainView_ReplaceAll, this);
             msg.Send();
         });
-        btn_new.onClick.AddListener(()=> 
+        btn_new.onClick.AddListener(() =>
         {
-            Message msg = new Message(MsgType.MainView_NewComp,this);
+            Message msg = new Message(MsgType.MainView_NewComp, this);
             msg.Send();
             NewCompUI();
         });
+
+        btn_ok.onClick.AddListener(()=> {
+
+            Message msg = new Message(MsgType.MainView_Affirm, this);
+            msg["tag"] = ipt_tag.text;
+            msg["name"] = ipt_comName.text;
+            msg.Send();
+        });
+
+        CleanUI();
 
     }
 
@@ -110,7 +129,7 @@ public class MainView : BaseUI {
 
         LogicUtils.Instance.RemoveChildren(tagGrid);
         LogicUtils.Instance.RemoveChildren(comGrid);
-        InitUI();
+        CleanUI();
 
         RectTransform rtf = tagGrid.GetComponent<RectTransform>();
         rtf.sizeDelta =new Vector2(nLength,rtf.sizeDelta.y);
@@ -145,6 +164,8 @@ public class MainView : BaseUI {
     /// <param name="_msg"></param>
     private void RefreshComList(Message _msg)
     {
+        CleanUI();
+
         m_pComProperty = _msg["coms"] as List<ComProperty>;
 
         int nLength = m_nComp * m_pComProperty.Count;
@@ -202,12 +223,21 @@ public class MainView : BaseUI {
         });
     }
 
+    /// <summary>
+    /// 新组件
+    /// </summary>
     private void NewCompUI()
     {
-        InitUI();
+        CleanUI();
+
+        ipt_comName.text = "新组件";
+        ipt_tag.text = "NewTest";
     }
 
-    private void InitUI()
+    /// <summary>
+    /// 初始化UI
+    /// </summary>
+    private void CleanUI()
     {
         txt_id.text = "";
         ipt_comName.text = "";
@@ -216,6 +246,7 @@ public class MainView : BaseUI {
         txt_file.text = "";
         m_strCurCom = "";
         m_strCurTag = "";
+        img_com.sprite = null;
     }
 
     /// <summary>
@@ -232,8 +263,12 @@ public class MainView : BaseUI {
     /// 导入模型
     /// </summary>
     /// <param name="_strModelName"></param>
-    public void OnRefreshModel(string _strModelName)
+    public void OnRefreshModel(string _strModelName,bool _isNewCom = false)
     {
+        if (_isNewCom)
+        {
+            txt_id.text = Utils.GetFilePrefix(_strModelName);
+        }
         txt_file.text = _strModelName;
     }
     #endregion

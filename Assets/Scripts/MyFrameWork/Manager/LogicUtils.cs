@@ -97,7 +97,7 @@ namespace MyFrameWork
             for (int i = 0; i < pRes.Count; i++)
             {
                 string strFile = pRes[i];
-                strFile = Utils.GetFileName(strFile);
+                strFile = Utils.GetFileNameByPath(strFile);
                 if (Utils.HasChinese(strFile))
                 {
                     pRes.Remove(pRes[i]);
@@ -134,7 +134,7 @@ namespace MyFrameWork
                 fileUrl = ofd.FileName;
             }
 
-            string strFile = Utils.GetFileName(fileUrl);
+            string strFile = Utils.GetFileNameByPath(fileUrl);
             if (Utils.HasChinese(strFile))
             {
                 return string.Empty;

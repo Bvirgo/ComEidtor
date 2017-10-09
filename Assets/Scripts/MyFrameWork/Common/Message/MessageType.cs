@@ -45,6 +45,7 @@ namespace MyFrameWork
         public const string MainView_LoadRes = "MainView_LoadRes";
         public const string MainView_Save = "MainView_Save";
         public const string MainView_NewComp = "MainView_NewComp";
+        public const string MainView_Affirm = "MainView_Affirm";
         
         #endregion
     }

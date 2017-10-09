@@ -46,6 +46,7 @@ public class MainModule : BaseModule {
         MessageCenter.Instance.AddListener(MsgType.MainView_LoadRes, LoadRes);
         MessageCenter.Instance.AddListener(MsgType.MainView_NewComp, NewComp);
         MessageCenter.Instance.AddListener(MsgType.MainView_Save, SaveToServer);
+        MessageCenter.Instance.AddListener(MsgType.MainView_Affirm, Affirm);
     }
 
     private void InitData()
@@ -79,7 +80,10 @@ public class MainModule : BaseModule {
         MessageCenter.Instance.RemoveListener(MsgType.MainView_ReplaceAll, OnReplaceAll);
         MessageCenter.Instance.RemoveListener(MsgType.MainView_TagItemClick, TagItemClick);
         MessageCenter.Instance.RemoveListener(MsgType.MainView_ComItemClick, ComItemClick);
+        MessageCenter.Instance.RemoveListener(MsgType.MainView_LoadRes, LoadRes);
         MessageCenter.Instance.RemoveListener(MsgType.MainView_NewComp, NewComp);
+        MessageCenter.Instance.RemoveListener(MsgType.MainView_Save, SaveToServer);
+        MessageCenter.Instance.RemoveListener(MsgType.MainView_Affirm, Affirm);
     }
 
     #endregion
@@ -151,7 +155,7 @@ public class MainModule : BaseModule {
                 PopWaiting();
 
                 string strFileName = res.GetName();
-                strFileName = Utils.GetPrefix(strFileName);
+                strFileName = Utils.GetFilePrefix(strFileName);
                 if (resName_Crc.ContainsKey(strFileName))
                 {
                     Debug.LogWarning("-------------模型文件重名：" + strFileName);
@@ -403,7 +407,7 @@ public class MainModule : BaseModule {
         {
             string strCmpData = Encoding.UTF8.GetString(data);
 
-            Utils.SaveInfo(strCmpData, "CompConfigFromNet");
+            Utils.SimpleSaveInfo(strCmpData, "CompConfigFromNet");
 
             _cb(strCmpData);
 
@@ -553,7 +557,7 @@ public class MainModule : BaseModule {
 
                     ResManager.Instance.OnCreateFbx(rNode.GetResource() as byte[], (obj) =>
                     {
-                        CreateNewModel(obj, Utils.GetPrefix(rNode.GetName()));
+                        CreateNewModel(obj, Utils.GetFilePrefix(rNode.GetName()));
                     });
                     break;
                 case ResType.AssetBundle:
@@ -565,7 +569,7 @@ public class MainModule : BaseModule {
                         if (model != null)
                         {
                             model = GameObject.Instantiate(model);
-                            CreateNewModel(model, Utils.GetPrefix(rNode.GetName()));
+                            CreateNewModel(model, Utils.GetFilePrefix(rNode.GetName()));
                         }
                         ab.Unload(false);
 
@@ -592,8 +596,12 @@ public class MainModule : BaseModule {
         }
 
         MainView mv = _msg.Sender as MainView;
+        if (mv == null)
+        {
+            return;
+        }
         string strPath = LogicUtils.Instance.OnImportOneFile();
-        string strFileName = Utils.GetFileName(strPath).ToLower();
+        string strFileName = Utils.GetFileNameByPath(strPath).ToLower();
         //Debug.LogWarning("当前文件路径："+strPath+"--文件名:"+strFileName);
         string strFilePostName = Utils.GetFilePostfix(strPath).ToLower();
 
@@ -601,9 +609,16 @@ public class MainModule : BaseModule {
         if (strFilePostName.Equals("fbx") ||
             strFilePostName.Equals("assetbundle"))
         {
-            if (!m_currentCom.m_strCode.ToLower().Equals(strFileName))
+            if (!m_currentCom.m_bIsNew && !m_currentCom.m_strCode.ToLower().Equals(strFileName))
             {
                 LogicUtils.Instance.OnAlert("资源名和组件Code不一致，不能导入资源!");
+                return;
+            }
+
+            // 新组件，Code唯一性检测
+            if (m_currentCom.m_bIsNew && !IsLegalCode(strFileName))
+            {
+                LogicUtils.Instance.OnAlert("新组件Code和已有组件重复！");
                 return;
             }
         }
@@ -625,11 +640,12 @@ public class MainModule : BaseModule {
                     m_rNewModel = rNode as LocalResourceNode;
                     ResManager.Instance.OnCreateFbx(m_rNewModel.GetResource() as byte[], (obj) => 
                     {
-                        CreateNewModel(obj, Utils.GetPrefix(m_rNewModel.GetName()));
+                        CreateNewModel(obj, Utils.GetFilePrefix(m_rNewModel.GetName()));
                         if (mv != null)
                         {
-                            mv.OnRefreshModel(rNode.GetName());
+                            mv.OnRefreshModel(rNode.GetName(),m_currentCom.m_bIsNew);
                         }
+
                     });
                     break;
                 case ResType.AssetBundle:
@@ -642,7 +658,7 @@ public class MainModule : BaseModule {
                             if (model != null)
                             {
                                 model = GameObject.Instantiate(model);
-                                CreateNewModel(model, Utils.GetPrefix(m_rNewModel.GetName()));
+                                CreateNewModel(model, Utils.GetFilePrefix(m_rNewModel.GetName()));
                                 if (mv != null)
                                 {
                                     mv.OnRefreshModel(rNode.GetName());
@@ -674,18 +690,25 @@ public class MainModule : BaseModule {
         GameObject compObj = new GameObject();
         compObj.name = _strName;
         LogicUtils.ResetStandardShader(_go);
+
         _go.transform.SetParent(compObj.transform);
         _go.transform.position = Vector3.zero;
         _go.transform.localScale = Vector3.one;
-        _go.SetActive(true);
+
         compObj.transform.position = Vector3.zero;
         compObj.transform.localScale = Vector3.one;
         compObj.transform.SetParent(m_objRoot.transform);
     }
 
-    private void NewComp(Message _msg)
+    /// <summary>
+    /// 确认修改
+    /// </summary>
+    /// <param name="_msg"></param>
+    private void Affirm(Message _msg)
     {
-        m_currentCom = null;
+        string strNewTag = _msg["tag"] as string;
+        string strNewShowName = _msg["name"] as string;
+        m_currentCom.OnAffirm(m_rNewModel, m_rNewImg, strNewTag, strNewShowName);
     }
 
     /// <summary>
@@ -696,52 +719,45 @@ public class MainModule : BaseModule {
     {
         string strNewTag = _msg["tag"] as string;
         string strNewShowName = _msg["name"] as string;
-        if (IsNeedUpdate(strNewTag,strNewShowName))
+
+        m_currentCom.OnAffirm(m_rNewModel, m_rNewImg, strNewTag, strNewShowName);
+
+        // 遍历所有的需要更新的组件
+        m_pMemeryRes.Clear();
+        m_qUpdateComp = new Queue<CompConfigData>();
+        code_CompConfig = new Dictionary<string, CompConfigData>();
+        m_pUpdateErComp = new List<CompConfigData>();
+
+        for (int i = 0; i < m_pComProperty.Count; i++)
         {
-            m_currentCom.UpdateCompProperty(m_rNewModel, m_rNewImg, strNewTag, strNewShowName);
-
-            // 遍历所有的需要更新的组件
-            m_pMemeryRes.Clear();
-            m_qUpdateComp = new Queue<CompConfigData>();
-            code_CompConfig = new Dictionary<string, CompConfigData>();
-            m_pUpdateErComp = new List<CompConfigData>();
-
-            for (int i = 0; i < m_pComProperty.Count; i++)
+            ComProperty cpp = m_pComProperty[i];
+            if (cpp.m_bNeedUpdate)
             {
-                ComProperty cpp = m_pComProperty[i];
-                if (cpp.m_bNeedUpdate)
-                {
-                    CompConfigData ccd = new CompConfigData();
-                    ccd.m_jsData = cpp.m_infoJson;
-                    ccd.m_strCode = cpp.m_strCode;
-                    m_qUpdateComp.Enqueue(ccd);
-                    code_CompConfig.AddOrReplace(ccd.m_strCode,ccd);
+                CompConfigData ccd = new CompConfigData();
+                ccd.m_jsData = cpp.m_infoJson;
+                ccd.m_strCode = cpp.m_strCode;
+                m_qUpdateComp.Enqueue(ccd);
+                code_CompConfig.AddOrReplace(ccd.m_strCode,ccd);
 
-                    if (cpp.m_rNewImg != null)
-                    {
-                        m_pMemeryRes.Add(cpp.m_rNewImg);
-                    }
-                    if (cpp.m_rNewModel != null)
-                    {
-                        m_pMemeryRes.Add(cpp.m_rNewModel);
-                    }
+                if (cpp.m_rNewImg != null)
+                {
+                    m_pMemeryRes.Add(cpp.m_rNewImg);
+                }
+                if (cpp.m_rNewModel != null)
+                {
+                    m_pMemeryRes.Add(cpp.m_rNewModel);
                 }
             }
+        }
 
-            // 先上传资源，再上传配置
-            UpdateRes(() => {
-                UpdateCompConfig(()=> {
-                    // 刷新列表
-                    RefreshCom();
-                });
-                
+        // 先上传资源，再上传配置
+        UpdateRes(() => {
+            UpdateCompConfig(()=> {
+                // 刷新列表
+                RefreshCom();
             });
-
-        }
-        else
-        {
-            LogicUtils.Instance.OnAlert("组件保存条件不满足！");
-        }
+                
+        });
     }
 
     /// <summary>
@@ -754,8 +770,16 @@ public class MainModule : BaseModule {
     {
         bool bUpdate = false;
 
-        if (m_currentCom == null)
+        if (m_currentCom == null )
         {
+            return bUpdate;
+        }
+
+        if (m_currentCom.m_bIsNew && (
+            m_rNewImg == null ||
+            m_rNewModel == null))
+        {
+            LogicUtils.Instance.OnAlert("新组件，必须有模型和缩略图！");
             return bUpdate;
         }
 
@@ -778,6 +802,45 @@ public class MainModule : BaseModule {
         }
 
         return bUpdate;
+    }
+
+    /// <summary>
+    /// 新组件，组件名唯一性检测
+    /// </summary>
+    /// <param name="_strCode"></param>
+    /// <returns></returns>
+    private bool IsLegalCode(string _strCode)
+    {
+        bool bLegal = true;
+        for (int i = 0; i < m_pComProperty.Count; i++)
+        {
+            string strCode = m_pComProperty[i].m_strCode;
+            if (!string.IsNullOrEmpty(strCode) && strCode.ToLower().Equals(_strCode))
+            {
+                bLegal = false;
+                break;
+            }
+        }
+
+        return bLegal;
+    }
+    #endregion
+
+    #region 新增组件
+
+    /// <summary>
+    /// 新组件
+    /// </summary>
+    /// <param name="_msg"></param>
+    private void NewComp(Message _msg)
+    {
+        m_currentCom = null;
+        m_rNewImg = null;
+        m_rNewModel = null;
+
+        ComProperty newCom = new ComProperty();
+        m_currentCom = newCom;
+        m_pComProperty.Add(newCom);
     }
     #endregion
 }
@@ -807,16 +870,18 @@ public class ComProperty
 
     public IResourceNode m_rNewImg;
     public IResourceNode m_rNewModel;
+
+    public bool m_bIsNew;
     public ComProperty(JsonData _jd)
     {
         string strInfo = _jd.ReadString("info");
         JsonData info = JsonMapper.ToObject(strInfo);
         m_infoJson = info;
-        m_strTag = info.ReadString("tag");
+        m_strTag = info.ReadString("tag","TestTag");
         m_strShowName = info.ReadString("name");
         m_strImg = info.ReadString("picName");
         m_strImgCrc = info.ReadString("picCrc");
-        m_strCode = info.ReadString("code");
+        m_strCode = info.ReadString("code","BJL341");
 
         string strData = info.ReadString("data");
         JsonData dataJD = JsonMapper.ToObject(strData);
@@ -829,67 +894,91 @@ public class ComProperty
         }
 
         m_bNeedUpdate = false;
+        m_bIsNew = false;
     }
 
     /// <summary>
-    /// 更新组件属性
+    ///  新组件
+    /// </summary>
+    public ComProperty()
+    {
+        m_bNeedUpdate = false;
+        m_bIsNew = true;
+        m_infoJson = JsonUtils.EmptyJsonObject;
+        m_strTag = "NewTest";
+        m_strShowName = "新组件";
+        m_infoJson["tag"] = m_strTag;
+        m_infoJson["name"] = m_strShowName;
+    }
+
+    /// <summary>
+    /// 确认修改
     /// </summary>
     /// <param name="_rModelNode"></param>
     /// <param name="_rImgNode"></param>
     /// <param name="_strTag"></param>
     /// <param name="_strShowName"></param>
-    public void UpdateCompProperty(IResourceNode _rModelNode,IResourceNode _rImgNode,
-        string _strTag,
-        string _strShowName)
+    public void OnAffirm(IResourceNode _rModelNode, IResourceNode _rImgNode,
+    string _strTag,
+    string _strShowName)
     {
         m_bNeedUpdate = true;
 
-        string strData = m_infoJson.ReadString("data");
+        string strData = m_infoJson.ReadString("data", JsonUtils.EmptyJsonArray.ToJson());
         JsonData jdData = JsonMapper.ToObject(strData);
         JsonData dataJD = jdData;
         JsonData jdNewData = JsonUtils.EmptyJsonArray;
 
-        if (dataJD.Count > 0)
+        if (dataJD.Count < 1)
         {
-            JsonData jdFbx = dataJD[0];
-            if (_rImgNode != null)
-            {
-                m_infoJson["picName"] = _rImgNode.GetName();
-                m_infoJson["picCrc"] = _rImgNode.GetCrc();
-
-                m_strImg = _rImgNode.GetName();
-                m_strImgCrc = _rImgNode.GetCrc();
-
-                m_rNewImg = _rImgNode;
-            }
-            if (_rModelNode != null)
-            {
-                jdFbx["fileName"] = _rModelNode.GetName();
-                jdFbx["fileCrc"] = _rModelNode.GetCrc();
-                jdFbx["type"] = _rModelNode.GetResType().ToString();
-
-                m_strModelCrc = _rModelNode.GetCrc();
-                m_strModelName = _rModelNode.GetName();
-                m_strModelType = _rModelNode.GetResType().ToString();
-
-                m_rNewModel = _rModelNode;
-            }
-            if (!_strShowName.Equals(m_strShowName))
-            {
-                m_infoJson["name"] = _strShowName;
-                m_strShowName = _strShowName;
-            }
-            if (!_strTag.Equals(m_strTag))
-            {
-                m_infoJson["tag"] = _strTag;
-                m_strTag = _strTag;
-            }
-
-            jdFbx["children"] = JsonUtils.EmptyJsonArray;
-            jdNewData.Add(jdFbx);
-            m_infoJson["data"] = jdNewData.ToJson();
-            Debug.LogWarning("NewComp:"+m_infoJson.ToJson());
+            JsonData jd = JsonUtils.EmptyJsonObject;
+            dataJD.Add(jd);
         }
+
+        JsonData jdFbx = dataJD[0];
+        if (_rImgNode != null)
+        {
+            m_infoJson["picName"] = _rImgNode.GetName();
+            m_infoJson["picCrc"] = _rImgNode.GetCrc();
+
+            m_strImg = _rImgNode.GetName();
+            m_strImgCrc = _rImgNode.GetCrc();
+
+            m_rNewImg = _rImgNode;
+        }
+        if (_rModelNode != null)
+        {
+            jdFbx["fileName"] = _rModelNode.GetName();
+            jdFbx["fileCrc"] = _rModelNode.GetCrc();
+            jdFbx["type"] = _rModelNode.GetResType().ToString();
+
+            m_strModelCrc = _rModelNode.GetCrc();
+            m_strModelName = _rModelNode.GetName();
+            m_strModelType = _rModelNode.GetResType().ToString();
+
+            m_rNewModel = _rModelNode;
+
+            if (m_bIsNew)
+            {
+                m_strCode = Utils.GetFilePrefix(m_strModelName);
+                m_infoJson["code"] = m_strCode;
+                m_infoJson["wallLength"] = "0";
+            }
+        }
+        if (!_strShowName.Equals(m_strShowName))
+        {
+            m_infoJson["name"] = _strShowName;
+            m_strShowName = _strShowName;
+        }
+        if (!_strTag.Equals(m_strTag))
+        {
+            m_infoJson["tag"] = _strTag;
+            m_strTag = _strTag;
+        }
+
+        jdFbx["children"] = JsonUtils.EmptyJsonArray;
+        jdNewData.Add(jdFbx);
+        m_infoJson["data"] = jdNewData.ToJson();
+        Debug.LogWarning("NewComp:" + m_infoJson.ToJson());
     }
-    
 }
