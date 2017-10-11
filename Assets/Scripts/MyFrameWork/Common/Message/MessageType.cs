@@ -8,18 +8,24 @@ namespace MyFrameWork
         public static string Net_MessageTestOne = "Net_MessageTestOne";
         public static string Net_MessageTestTwo = "Net_MessageTestTwo";
         #endregion
+
         #region Common
+
+        // ÊôÐÔ×÷±×Òì³£
+        public const string Com_PropertyException = "PropertyItemDataException";
+
         public const string Com_CloseUI = "Com_CloseUI";
         public const string Com_OpenUI = "Com_OpenUI";
+
         #endregion
 
         #region WaitingView
-        public const string Com_ShowWaiting = "Com_ShowWaiting";
-        public const string Com_NewWaiting = "Com_NewWating";
-        public const string Com_HideWaiting = "Com_HideWaiting";
-        public const string Com_UpdateWaiting = "Com_UpdateWaiting";
-        public const string Com_PushWaiting = "Com_PushWaiting";
-        public const string Com_PopWaiting = "Com_PopWaiting";
+        public const string WV_ShowWaiting = "Com_ShowWaiting";
+        public const string WV_NewWaiting = "Com_NewWating";
+        public const string WV_HideWaiting = "Com_HideWaiting";
+        public const string WV_UpdateWaiting = "Com_UpdateWaiting";
+        public const string WV_PushWaiting = "Com_PushWaiting";
+        public const string WV_PopWaiting = "Com_PopWaiting";
         #endregion
 
         #region AlertWindow

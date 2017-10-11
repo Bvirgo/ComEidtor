@@ -43,7 +43,7 @@ public class LoginModule : BaseModule {
                 Debug.Log("登录返回信息：" + resp.WwwText);
                 UserCache.SetUserName(strUser);
                 UserCache.SetPassword(strPsw);
-                JsonData js = JsonMapper.ToObject(resp.WwwText);
+                //JsonData js = JsonMapper.ToObject(resp.WwwText);
                 msg = new Message(MsgType.MainView_Show, this);
                 msg.Send();
             }

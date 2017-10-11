@@ -46,7 +46,6 @@ public class MainView : BaseUI {
     private List<ComProperty> m_pComProperty;
     private string m_strCurTag;
     private string m_strCurCom;
-    //private List<>
     #endregion
 
     #region Base
@@ -70,8 +69,9 @@ public class MainView : BaseUI {
 
     private void InitData()
     {
-        m_objComPrefabs = ResManager.Instance.Load("Prefabs/UI/CompItem") as GameObject;
-        m_objTagPrefabs = ResManager.Instance.Load("Prefabs/UI/TagItem") as GameObject;
+        
+        m_objComPrefabs = ResManager.Instance.Load(UIPathDefines.UI_PREFAB  + "CompItem") as GameObject;
+        m_objTagPrefabs = ResManager.Instance.Load(UIPathDefines.UI_PREFAB  + "TagItem") as GameObject;
 
         btn_load.onClick.AddListener(() =>
         {

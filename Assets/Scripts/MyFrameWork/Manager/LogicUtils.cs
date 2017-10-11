@@ -27,7 +27,7 @@ namespace MyFrameWork
         /// <param name="_nMax">Max Value</param>
         public void OnShowWaiting(int _nID, string _strTips, bool _bClock = false, int _nMax = 99)
         {
-            Message msg = new Message(MsgType.Com_ShowWaiting, this);
+            Message msg = new Message(MsgType.WV_ShowWaiting, this);
             msg["id"] = _nID;
             msg["type"] = _bClock ? Defines.WaitingType_Clock : Defines.WaitingType_Percent;
             msg["tips"] = _strTips;
@@ -37,7 +37,7 @@ namespace MyFrameWork
 
         public void OnPopWaiting(int _nID)
         {
-            Message msg = new Message(MsgType.Com_PopWaiting, this);
+            Message msg = new Message(MsgType.WV_PopWaiting, this);
             msg["id"] = _nID;
             msg.Send();
         }
@@ -48,7 +48,7 @@ namespace MyFrameWork
         /// <param name="_nID"></param>
         public void OnPushWaiting(int _nID)
         {
-            Message msg = new Message(MsgType.Com_PushWaiting, this);
+            Message msg = new Message(MsgType.WV_PushWaiting, this);
             msg["id"] = _nID;
             msg.Send();
         }
@@ -58,7 +58,7 @@ namespace MyFrameWork
         /// </summary>
         public void OnHideWaiting()
         {
-            Message msg = new Message(MsgType.Com_HideWaiting, this);
+            Message msg = new Message(MsgType.WV_HideWaiting, this);
             msg.Send();
         }
         #endregion

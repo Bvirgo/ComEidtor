@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using MyFrameWork;
 
 public enum EnumCameraState
 {
@@ -41,8 +42,8 @@ public class CameraCtrl : MonoBehaviour
         get { return _cameraState; }
         set
         {
-            EnumCameraState oldState;
-            oldState = _cameraState;
+            //EnumCameraState oldState;
+            //oldState = _cameraState;
             _cameraState = value;
             switch (_cameraState)
             {
@@ -232,8 +233,6 @@ public class FocusCtrl
     public float radius = 0;
     public float height = 0;
     public bool createModel = false;
-
-    private string strFocusModel = "Player/RenWu/Prefab/w3";
     Animator _rollAnimator;
     Animator rollAnimator
     {
@@ -254,7 +253,10 @@ public class FocusCtrl
         {
             isWalk = value;
             if (rollAnimator != null)
-                rollAnimator.SetBool("IsWalk", isWalk);
+            {
+                //rollAnimator.SetBool("IsWalk", isWalk);
+                rollAnimator.SetBool("Dash", isWalk);
+            }
         }
     }
 
@@ -271,10 +273,8 @@ public class FocusCtrl
             focusPos = value;
             if (focusBall == null && createModel)
             {
-                focusBall = (GameObject)GameObject.Instantiate(Resources.Load(strFocusModel));
-                //focusBall = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                //focusBall = new GameObject();
-                focusBall.name = "CameraFocus";
+                focusBall = (GameObject)GameObject.Instantiate(Resources.Load(Defines.PlayerModel));
+                focusBall.name = "Role";
             }
             if (focusBall != null)
             {

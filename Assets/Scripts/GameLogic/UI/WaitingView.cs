@@ -44,8 +44,8 @@ public class WaitingView : BaseUI {
         m_nTotal = (int)msg["t"];
         Init(m_strTips,strType);
 
-        MessageCenter.Instance.AddListener(MsgType.Com_UpdateWaiting, OnUpdate);
-        MessageCenter.Instance.AddListener(MsgType.Com_NewWaiting, OnShowWaiting);
+        MessageCenter.Instance.AddListener(MsgType.WV_UpdateWaiting, OnUpdate);
+        MessageCenter.Instance.AddListener(MsgType.WV_NewWaiting, OnShowWaiting);
     }
     protected override void OnAwake()
     {
@@ -56,8 +56,8 @@ public class WaitingView : BaseUI {
     {
         base.OnRelease();
 
-        MessageCenter.Instance.RemoveListener(MsgType.Com_UpdateWaiting, OnUpdate);
-        MessageCenter.Instance.RemoveListener(MsgType.Com_NewWaiting, OnShowWaiting);
+        MessageCenter.Instance.RemoveListener(MsgType.WV_UpdateWaiting, OnUpdate);
+        MessageCenter.Instance.RemoveListener(MsgType.WV_NewWaiting, OnShowWaiting);
     }
 
     private void Init(string _strTips,string _strType)

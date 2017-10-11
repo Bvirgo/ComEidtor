@@ -314,7 +314,7 @@ public class CityMaterial :IJsonData
         {
             //cityMat.matName = cityMat.matName.Substring(0, cityMat.matName.Length - backstr.Length);
             cityMat.matName = Utils.RemovePostfix_Instance(cityMat.matName);
-            CityMaterialParamList paramList = CityMaterialParamList.CreateFromJson(cityMat.matParams);
+            //CityMaterialParamList paramList = CityMaterialParamList.CreateFromJson(cityMat.matParams);
 
             string strName = cityMat.matName;
             if (strName.IndexOf("(") > -1)

@@ -125,7 +125,7 @@ namespace MyFrameWork
         OnMove,
     }
 
-    public enum EnumPropertyType : int
+    public enum PropertyType : int
     {
         RoleName = 1, // 角色名
         Sex,     // 性别
@@ -143,12 +143,30 @@ namespace MyFrameWork
         Fire,   //火系攻击（点数）
     }
 
+    /// <summary>
+    /// 角色类型
+    /// </summary>
     public enum EnumActorType
     {
         None = 0,
         Role,
         Monster,
         NPC,
+    }
+
+    /// <summary>
+    /// 场景类型
+    /// </summary>
+    public enum EnumSceneType
+    {
+        None = 0,
+        StartGame,
+        LoadingScene,
+        LoginScene,
+        MainScene,
+        CopyScene,
+        PVPScene,
+        PVEScene,
     }
 
     #endregion
@@ -163,7 +181,7 @@ namespace MyFrameWork
         /// <summary>
         /// UI预设。
         /// </summary>
-        public const string UI_PREFAB = "Prefabs/UI/";
+        public const string UI_PREFAB = "UIPrefabs/";
         /// <summary>
         /// UI小控件预设。
         /// </summary>
@@ -264,6 +282,9 @@ namespace MyFrameWork
 
         public const string AlertType_Single = "Alert_Single";
         public const string AlertType_List = "Alert_List";
+        
+        public const string PlayerModel = "SantaMale/Prefabs/SantaMale";
+        public const string MainGroundPath = "Maps/Ground";
     }
     #endregion
 

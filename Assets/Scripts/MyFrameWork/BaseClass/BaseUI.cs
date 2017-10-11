@@ -8,6 +8,9 @@ using System.Collections.Generic;
 
 namespace MyFrameWork
 {
+    /// <summary>
+    /// 大UI，需要纳入UIMgr管理的UI
+    /// </summary>
     public abstract class BaseUI : MonoBehaviour
     {
         #region Cache gameObject & transfrom

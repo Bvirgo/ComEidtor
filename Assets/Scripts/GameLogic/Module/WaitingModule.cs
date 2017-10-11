@@ -52,19 +52,19 @@ public class WaitingModule : BaseModule {
 
     private void RegisterMessage()
     {
-        MessageCenter.Instance.AddListener(MsgType.Com_PopWaiting, PopWaiting);
-        MessageCenter.Instance.AddListener(MsgType.Com_PushWaiting, PushWaiting);
-        MessageCenter.Instance.AddListener(MsgType.Com_ShowWaiting, ShowWaiting);
-        MessageCenter.Instance.AddListener(MsgType.Com_HideWaiting, Hide);
+        MessageCenter.Instance.AddListener(MsgType.WV_PopWaiting, PopWaiting);
+        MessageCenter.Instance.AddListener(MsgType.WV_PushWaiting, PushWaiting);
+        MessageCenter.Instance.AddListener(MsgType.WV_ShowWaiting, ShowWaiting);
+        MessageCenter.Instance.AddListener(MsgType.WV_HideWaiting, Hide);
     }
 
     protected override void OnRelease()
     {
         base.OnRelease();
-        MessageCenter.Instance.RemoveListener(MsgType.Com_ShowWaiting, ShowWaiting);
-        MessageCenter.Instance.RemoveListener(MsgType.Com_HideWaiting, Hide);
-        MessageCenter.Instance.RemoveListener(MsgType.Com_PopWaiting, PopWaiting);
-        MessageCenter.Instance.RemoveListener(MsgType.Com_PushWaiting, PushWaiting);
+        MessageCenter.Instance.RemoveListener(MsgType.WV_ShowWaiting, ShowWaiting);
+        MessageCenter.Instance.RemoveListener(MsgType.WV_HideWaiting, Hide);
+        MessageCenter.Instance.RemoveListener(MsgType.WV_PopWaiting, PopWaiting);
+        MessageCenter.Instance.RemoveListener(MsgType.WV_PushWaiting, PushWaiting);
     }
 
     private void SetMax(Message _msg)
@@ -122,7 +122,7 @@ public class WaitingModule : BaseModule {
                 }
                 else
                 {
-                    Message msg = new Message(MsgType.Com_UpdateWaiting, this);
+                    Message msg = new Message(MsgType.WV_UpdateWaiting, this);
                     msg["t"] = m_nTotal;
                     msg["c"] = m_nCurrent;
                     msg.Send();
@@ -161,7 +161,7 @@ public class WaitingModule : BaseModule {
                 }
                 else
                 {
-                    Message msg = new Message(MsgType.Com_UpdateWaiting, this);
+                    Message msg = new Message(MsgType.WV_UpdateWaiting, this);
                     msg["t"] = m_nTotal;
                     msg["c"] = m_nCurrent;
                     msg.Send();
@@ -218,7 +218,7 @@ public class WaitingModule : BaseModule {
             {
                 Message msg = mInfo.msg;
                 m_curMsgKey = nKey;
-                Message newMsg = new Message(MsgType.Com_NewWaiting, msg);
+                Message newMsg = new Message(MsgType.WV_NewWaiting, msg);
                 newMsg.Send();
             }
         }

@@ -7,19 +7,21 @@ namespace MyFrameWork
 {
 	public class ModuleManager : Singleton<ModuleManager>
 	{
-		private Dictionary<string, BaseModule> dicModules = null;
+        #region Base Data
+        private Dictionary<string, BaseModule> dicModules = null;
 
-		public override void Init ()
-		{
-			dicModules = new Dictionary<string, BaseModule> ();
-		}
+        public override void Init()
+        {
+            dicModules = new Dictionary<string, BaseModule>();
+        }
+        #endregion
 
-		#region Get Module
-		/// <summary>
-		/// Get the specified key.
-		/// </summary>
-		/// <param name="key">Key.</param>
-		public BaseModule Get(string key)
+        #region Get Module
+        /// <summary>
+        /// Get the specified key.
+        /// </summary>
+        /// <param name="key">Key.</param>
+        public BaseModule Get(string key)
 		{
 			if (dicModules.ContainsKey(key))
 				return dicModules[key];
@@ -38,14 +40,39 @@ namespace MyFrameWork
 			    return dicModules[t.ToString()] as T;
 			return null;
 		}
-		#endregion
+        #endregion
 
-		#region Register Module By Module Type
-		/// <summary>
-		/// Register the specified module.
-		/// </summary>
-		/// <param name="module">Module.</param>
-		public void Register(BaseModule module)
+        #region Register Module By Module Type
+        /// <summary>
+        /// Register All Module
+        /// </summary>
+        public void RegisterAllModules()
+        {
+            LoadModule(typeof(WaitingModule));
+
+            LoadModule(typeof(LoginModule));
+
+            LoadModule(typeof(MainModule));
+
+            LoadModule(typeof(WindowModule));
+
+            //.....add
+        }
+
+        /// <summary>
+        /// 创建指定M，初始化
+        /// </summary>
+        /// <param name="moduleType"></param>
+        private void LoadModule(Type moduleType)
+        {
+            BaseModule bm = System.Activator.CreateInstance(moduleType) as BaseModule;
+            bm.Load();
+        }
+        /// <summary>
+        /// Register the specified module.
+        /// </summary>
+        /// <param name="module">Module.</param>
+        public void Register(BaseModule module)
 		{
 			Type t = module.GetType();
 			Register(t.ToString(), module);

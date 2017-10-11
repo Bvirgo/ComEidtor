@@ -5,11 +5,14 @@ using System.Collections.Generic;
 
 namespace MyFrameWork
 {
+    /// <summary>
+    /// 场景基类：MainScene,LoginScene,CopyScene,PVEScene.....
+    /// </summary>
 	public class BaseScene : BaseModule
 	{
+        // 场景角色列表
 		protected List<BaseActor> actorList = null;
-
-		
+        
 		public BaseScene ()
 		{
 			actorList = new List<BaseActor> ();
@@ -46,6 +49,13 @@ namespace MyFrameWork
 			return null;
 		}
 
+        /// <summary>
+        /// 角色属性变更
+        /// </summary>
+        /// <param name="actor"></param>
+        /// <param name="id"></param>
+        /// <param name="oldValue"></param>
+        /// <param name="newValue"></param>
 		protected void OnActorPropertyChanged(BaseActor actor, int id, object oldValue, object newValue)
 		{
 

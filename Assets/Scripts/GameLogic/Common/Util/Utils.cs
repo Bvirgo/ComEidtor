@@ -863,7 +863,7 @@ public static class Utils
         float A = va.y * vb.z + vb.y * vc.z + vc.y * va.z - va.y * vc.z - vb.y * va.z - vc.y * vb.z;
         float B = -(va.x * vb.z + vb.x * vc.z + vc.x * va.z - vc.x * vb.z - vb.x * va.z - va.x * vc.z);
         float C = va.x * vb.y + vb.x * vc.y + vc.x * va.y - va.x * vc.y - vb.x * va.y - vc.x * vb.y;
-        float D = -(va.x * vb.y * vc.z + vb.x * vc.y * va.z + vc.x * va.y * vb.z - va.x * vc.y * vb.z - vb.x * va.y * vc.z - vc.x * vb.y * va.z);
+        //float D = -(va.x * vb.y * vc.z + vb.x * vc.y * va.z + vc.x * va.y * vb.z - va.x * vc.y * vb.z - vb.x * va.y * vc.z - vc.x * vb.y * va.z);
         float E = Mathf.Sqrt(A * A + B * B + C * C);
         Vector3 res = new Vector3(A / E, B / E, C / E);
         return (res);
@@ -904,5 +904,57 @@ public static class Utils
         return results.Count > 0;
     }
 
+    #endregion
+
+    #region 加密 & 解密
+    // 定义秘钥
+    private const string ENCRYPT_KEY = "cyan";
+    /// <summary> /// 加密字符串   
+    /// </summary>  
+    /// <param name="str">要加密的字符串</param>  
+    /// <returns>加密后的字符串</returns>  
+    public static string Encrypt(string str)
+    {
+        DESCryptoServiceProvider descsp = new DESCryptoServiceProvider();   //实例化加/解密类对象   
+
+        byte[] key = Encoding.Unicode.GetBytes(ENCRYPT_KEY); //定义字节数组，用来存储密钥    
+
+        byte[] data = Encoding.Unicode.GetBytes(str);//定义字节数组，用来存储要加密的字符串  
+
+        MemoryStream MStream = new MemoryStream(); //实例化内存流对象      
+
+        //使用内存流实例化加密流对象   
+        CryptoStream CStream = new CryptoStream(MStream, descsp.CreateEncryptor(key, key), CryptoStreamMode.Write);
+
+        CStream.Write(data, 0, data.Length);  //向加密流中写入数据      
+
+        CStream.FlushFinalBlock();              //释放加密流      
+
+        return Convert.ToBase64String(MStream.ToArray());//返回加密后的字符串  
+    } 
+    /// <summary>  
+    /// 解密字符串   
+    /// </summary>  
+    /// <param name="str">要解密的字符串</param>  
+    /// <returns>解密后的字符串</returns>  
+    public static string Decrypt(string str)
+    {
+        DESCryptoServiceProvider descsp = new DESCryptoServiceProvider();   //实例化加/解密类对象    
+
+        byte[] key = Encoding.Unicode.GetBytes(ENCRYPT_KEY); //定义字节数组，用来存储密钥    
+
+        byte[] data = Convert.FromBase64String(str);//定义字节数组，用来存储要解密的字符串  
+
+        MemoryStream MStream = new MemoryStream(); //实例化内存流对象      
+
+        //使用内存流实例化解密流对象       
+        CryptoStream CStream = new CryptoStream(MStream, descsp.CreateDecryptor(key, key), CryptoStreamMode.Write);
+
+        CStream.Write(data, 0, data.Length);      //向解密流中写入数据     
+
+        CStream.FlushFinalBlock();               //释放解密流      
+
+        return Encoding.Unicode.GetString(MStream.ToArray());       //返回解密后的字符串  
+    }
     #endregion
 }

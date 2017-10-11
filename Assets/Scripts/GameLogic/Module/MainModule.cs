@@ -10,16 +10,13 @@ using System.Text;
 public class MainModule : BaseModule {
 
     #region Member
-    private Dictionary<string, List<CompConfigData>> tag_comps;
     private Queue<string> m_qResPaths;
-    private StringBuilder m_sbFbxInfo;
     private JsonData m_jdFbx;
     private Dictionary<string, JsonData> resName_Crc;
     private List<IResourceNode> m_pMemeryRes;
     private Queue<CompConfigData> m_qUpdateComp;
     private List<CompConfigData> m_pUpdateErComp;
     private Dictionary<string,CompConfigData> code_CompConfig;
-    private JsonData m_jErrorComp;
 
     private List<ComProperty> m_pComProperty;
     private GameObject m_objRoot;
@@ -59,7 +56,6 @@ public class MainModule : BaseModule {
         }
         m_pComProperty = new List<ComProperty>();
         m_jdFbx = JsonUtils.EmptyJsonArray;
-        m_jErrorComp = JsonUtils.EmptyJsonArray;
         resName_Crc = new Dictionary<string, JsonData>();
 
         m_qUpdateComp = new Queue<CompConfigData>();
@@ -104,9 +100,7 @@ public class MainModule : BaseModule {
     /// </summary>
     private void LoadResources()
     {
-        m_sbFbxInfo = new StringBuilder("");
         m_jdFbx = JsonUtils.EmptyJsonArray;
-        m_jErrorComp = JsonUtils.EmptyJsonArray;
         resName_Crc = new Dictionary<string, JsonData>();
 
         m_qUpdateComp = new Queue<CompConfigData>();
@@ -235,7 +229,6 @@ public class MainModule : BaseModule {
     private void ReadCompDataForUpdate(string _strJson)
     {
         JsonData ConfigJD = JsonMapper.ToObject(_strJson);
-        tag_comps = new Dictionary<string, List<CompConfigData>>();
 
         JsonData jdNewCompConfig = JsonUtils.EmptyJsonArray;
 
@@ -246,14 +239,14 @@ public class MainModule : BaseModule {
         for (int iClass = 0, lenClass = ConfigJD.Count; iClass < lenClass; iClass++)
         {
             JsonData classJD = ConfigJD[iClass];
-            string strKey = classJD.ReadString("name");
+            //string strKey = classJD.ReadString("name");
             string strInfo = classJD.ReadString("info");
 
             JsonData info = JsonMapper.ToObject(strInfo);
-            string strTag = info.ReadString("tag");
-            string strShowName = info.ReadString("name");
-            string strPicName = info.ReadString("picName");
-            string strPicCrc = info.ReadString("picCrc");
+            //string strTag = info.ReadString("tag");
+            //string strShowName = info.ReadString("name");
+            //string strPicName = info.ReadString("picName");
+            //string strPicCrc = info.ReadString("picCrc");
             string strCode = info.ReadString("code");
 
             string strData = info.ReadString("data");
@@ -326,7 +319,7 @@ public class MainModule : BaseModule {
     {
         UIManager.Instance.OpenUICloseOthers(UIType.Main, false);
 
-        GameObject objGround = Resources.Load("Prefabs/Ground") as GameObject;
+        GameObject objGround = Resources.Load(Defines.MainGroundPath) as GameObject;
         objGround = GameObject.Instantiate(objGround);
         objGround.transform.position = Vector3.zero;
 
@@ -386,7 +379,7 @@ public class MainModule : BaseModule {
         {
             JsonData jd = JsonMapper.ToObject(strRes);
 
-            string strNetCrc = jd.ReadString("crc");
+            //string strNetCrc = jd.ReadString("crc");
             string strUrl = jd.ReadString("url");
 
             //Debug.LogWarning("Crc:" + strNetCrc + "--Url:" + strUrl);
@@ -411,7 +404,7 @@ public class MainModule : BaseModule {
 
             _cb(strCmpData);
 
-            string strTest = strCmpData.Substring(0, 1000);
+            //string strTest = strCmpData.Substring(0, 1000);
             // 测试
             //LogicMgr.Instance.OnAlert(strTest, "测试", () => { Debug.LogWarning("ok"); }, () => { Debug.LogWarning("cancel"); });
 
@@ -543,7 +536,6 @@ public class MainModule : BaseModule {
     private void LoadCompModelFromServer(string _strName,string _strCrc)
     {
         ResManager.Instance.OnLoadServerRes(_strName, _strCrc, (rNode) => {
-
             // 上个组件资源回调
             if (!rNode.GetName().Equals(m_currentCom.m_strModelName) 
             || m_rNewModel != null)
